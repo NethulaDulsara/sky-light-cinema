@@ -55,6 +55,11 @@ export default {
     default: 'rgb(26, 26, 26)',
     dark: 'rgb(26, 26, 26)'
   },
+  text: {
+    primary: white,
+    secondary: '#9EA0A4',
+    link: lightBlue[300]
+  },
   border: '#DFE3E8',
   divider: '#DFE3E8',
   oxfordBlue: 'rgba(5, 41, 73, 1)',

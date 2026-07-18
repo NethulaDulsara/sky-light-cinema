@@ -55,7 +55,7 @@ class AddCinema extends Component {
       seatsAvailable,
       seats
     } = this.state;
-    const cinema = { name, ticketPrice, city, seatsAvailable, seats };
+    const cinema = { name, ticketPrice: Number(ticketPrice), city, seatsAvailable: Number(seatsAvailable), seats };
     let notification = {};
     type === 'create'
       ? (notification = await createCinemas(image, cinema))
@@ -190,6 +190,7 @@ class AddCinema extends Component {
               label="Ticket Price"
               margin="dense"
               type="number"
+              required
               value={ticketPrice}
               variant="outlined"
               onChange={event =>

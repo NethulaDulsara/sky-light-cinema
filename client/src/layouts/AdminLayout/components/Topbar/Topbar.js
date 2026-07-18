@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { logout } from '../../../../store/actions';
 import { withStyles } from '@material-ui/core/styles';
-import { Badge, Toolbar, IconButton } from '@material-ui/core';
+import { Badge, Toolbar, IconButton, Typography } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import CloseIcon from '@material-ui/icons/Close';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
@@ -43,7 +43,9 @@ class Topbar extends Component {
       <div className={`${classes.root} , ${ToolbarClasses}`}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.brandWrapper}>
-            <div className={classes.logo}>Movie Store</div>
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <div className={classes.logo}>Sky Light Cinema</div>
+            </Link>
             <IconButton
               className={classes.menuButton}
               aria-label="Menu"
@@ -52,10 +54,9 @@ class Topbar extends Component {
             </IconButton>
           </div>
 
-          <NavLink className={classes.title} to="/">
-            Movie Store ->
-          </NavLink>
-
+          <Typography className={classes.title} variant="h6" color="inherit">
+            {this.props.title}
+          </Typography>
           <IconButton
             className={classes.notificationsButton}
             onClick={() => console.log('Notification')}>

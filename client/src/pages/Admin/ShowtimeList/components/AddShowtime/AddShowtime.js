@@ -78,23 +78,23 @@ class AddShowtime extends Component {
   };
 
   onFilterMinDate = () => {
-    const { nowShowing } = this.props;
+    const { movies } = this.props;
     const { movieId } = this.state;
-    const selectedMovie = nowShowing.find(movie => movie._id === movieId);
-    if (selectedMovie) return selectedMovie.startDate;
+    const selectedMovie = movies.find(movie => movie._id === movieId);
+    if (selectedMovie) return new Date(selectedMovie.releaseDate);
     return new Date();
   };
 
   onFilterMaxDate = () => {
-    const { nowShowing } = this.props;
+    const { movies } = this.props;
     const { movieId } = this.state;
-    const selectedMovie = nowShowing.find(movie => movie._id === movieId);
+    const selectedMovie = movies.find(movie => movie._id === movieId);
     if (selectedMovie) return new Date(selectedMovie.endDate);
     return false;
   };
 
   render() {
-    const { nowShowing, cinemas, classes, className } = this.props;
+    const { movies, cinemas, classes, className } = this.props;
     const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
 
     const rootClassName = classNames(classes.root, className);
@@ -150,7 +150,7 @@ class AddShowtime extends Component {
               onChange={event =>
                 this.handleFieldChange('movieId', event.target.value)
               }>
-              {nowShowing.map(movie => (
+              {movies.map(movie => (
                 <MenuItem key={movie._id} value={movie._id}>
                   {movie.title}
                 </MenuItem>
@@ -231,7 +231,6 @@ AddShowtime.propTypes = {
 
 const mapStateToProps = ({ movieState, cinemaState }) => ({
   movies: movieState.movies,
-  nowShowing: movieState.nowShowing,
   cinemas: cinemaState.cinemas
 });
 

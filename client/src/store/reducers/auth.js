@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   token: localStorage.getItem('jwtToken'),
-  isAuthenticated: null,
+  isAuthenticated: !!localStorage.getItem('jwtToken'),
   loading: true,
   user: null
 };

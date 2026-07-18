@@ -35,6 +35,11 @@ import BookingInvitation from './components/BookingInvitation/BookingInvitation'
 import jsPDF from 'jspdf';
 
 class BookingPage extends Component {
+  state = {
+    isSeatSelectionVisible: false,
+    ticketCount: 1
+  };
+
   didSetSuggestion = false;
 
   componentDidMount() {
@@ -65,6 +70,14 @@ class BookingPage extends Component {
     }
   }
 
+  onShowSeatSelection = (ticketCount) => {
+    this.setState({ isSeatSelectionVisible: true, ticketCount });
+  };
+
+  onHideSeatSelection = () => {
+    this.setState({ isSeatSelectionVisible: false });
+  };
+
   // JSpdf Generator For generating the PDF
   jsPdfGenerator = () => {
     const { movie, cinema, selectedDate, selectedTime, QRCode } = this.props;
@@ -87,18 +100,22 @@ class BookingPage extends Component {
   };
 
   onSelectSeat = (row, seat) => {
-    const { cinema, setSelectedSeats } = this.props;
-    const seats = [...cinema.seats];
-    const newSeats = [...seats];
-    if (seats[row][seat] === 1) {
-      newSeats[row][seat] = 1;
-    } else if (seats[row][seat] === 2) {
-      newSeats[row][seat] = 0;
-    } else if (seats[row][seat] === 3) {
-      newSeats[row][seat] = 2;
-    } else {
-      newSeats[row][seat] = 2;
+    const { setSelectedSeats, selectedSeats } = this.props;
+    const { ticketCount } = this.state;
+    const seats = this.onGetReservedSeats();
+    
+    // If the seat is already occupied or doesn't exist, do nothing
+    if (!seats[row] || seats[row][seat] === 1) return;
+
+    // Check if the seat is currently selected
+    // Note: Redux action toggles the seat if it's already in selectedSeats
+    const isSelected = selectedSeats.some(s => s[0] === row && s[1] === seat);
+
+    // If it's not selected and we've reached the ticket limit, show an alert or just return
+    if (!isSelected && selectedSeats.length >= ticketCount) {
+      return; 
     }
+
     setSelectedSeats([row, seat]);
   };
 
@@ -190,7 +207,12 @@ class BookingPage extends Component {
     const { reservations, cinema, selectedDate, selectedTime } = this.props;
 
     if (!cinema) return [];
-    const newSeats = [...cinema.seats];
+    let newSeats = cinema.seats.map(row => [...row]);
+
+    // If cinema has no seats, generate a default 10x10 seat map (100 seats)
+    if (newSeats.length === 0) {
+      newSeats = Array.from({ length: 10 }, () => Array(10).fill(0));
+    }
 
     const filteredReservations = reservations.filter(
       reservation =>
@@ -373,22 +395,45 @@ class BookingPage extends Component {
       this.didSetSuggestion = true;
     }
 
+    // Apply selectedSeats to the seats array
+    if (selectedSeats && selectedSeats.length) {
+      selectedSeats.forEach(seatCoord => {
+        const [row, seat] = seatCoord;
+        if (seats[row] && seats[row][seat] !== undefined) {
+          seats[row][seat] = 2; // 2 = Selected
+        }
+      });
+    }
+
+    const { isSeatSelectionVisible, ticketCount } = this.state;
+
     return (
-      <Container maxWidth="xl" className={classes.container}>
-        <Grid container spacing={2} style={{ height: '100%' }}>
-          <MovieInfo movie={movie} />
-          <Grid item lg={9} xs={12} md={12}>
-            <BookingForm
-              cinemas={uniqueCinemas}
-              times={uniqueTimes}
-              showtimes={showtimes}
-              selectedCinema={selectedCinema}
-              selectedDate={selectedDate}
-              selectedTime={selectedTime}
-              onChangeCinema={this.onChangeCinema}
-              onChangeDate={this.onChangeDate}
-              onChangeTime={this.onChangeTime}
-            />
+      <div className={classes.root}>
+        {isSeatSelectionVisible ? (
+          <>
+            {cinema && selectedCinema && selectedTime && !showInvitation && (
+              <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1200, backgroundColor: '#0a0a20', color: '#fff', overflowY: 'auto', paddingBottom: '100px' }}>
+                <BookingSeats
+                  seats={seats}
+                  cinema={cinema}
+                  selectedTime={selectedTime}
+                  ticketCount={ticketCount}
+                  onHideSeatSelection={this.onHideSeatSelection}
+                  onSelectSeat={(indexRow, index) =>
+                    this.onSelectSeat(indexRow, index)
+                  }
+                />
+                <BookingCheckout
+                  user={user}
+                  ticketPrice={cinema.ticketPrice}
+                  seatsAvailable={cinema.seatsAvailable}
+                  selectedSeats={selectedSeats.length}
+                  ticketCount={ticketCount}
+                  onHideSeatSelection={this.onHideSeatSelection}
+                  onBookSeats={() => this.checkout()}
+                />
+              </div>
+            )}
             {showInvitation && !!selectedSeats.length && (
               <BookingInvitation
                 selectedSeats={selectedSeats}
@@ -399,34 +444,38 @@ class BookingPage extends Component {
                 onDownloadPDF={this.jsPdfGenerator}
               />
             )}
-
-            {cinema && selectedCinema && selectedTime && !showInvitation && (
-              <>
-                <BookingSeats
-                  seats={seats}
-                  onSelectSeat={(indexRow, index) =>
-                    this.onSelectSeat(indexRow, index)
-                  }
-                />
-                <BookingCheckout
-                  user={user}
-                  ticketPrice={cinema.ticketPrice}
-                  seatsAvailable={cinema.seatsAvailable}
-                  selectedSeats={selectedSeats.length}
-                  onBookSeats={() => this.checkout()}
-                />
-              </>
-            )}
-          </Grid>
-        </Grid>
-        <ResponsiveDialog
-          id="Edit-cinema"
-          open={showLoginPopup}
-          handleClose={() => toggleLoginPopup()}
-          maxWidth="sm">
-          <LoginForm />
-        </ResponsiveDialog>
-      </Container>
+          </>
+        ) : (
+          <>
+            <MovieInfo movie={movie} />
+            <Container maxWidth="xl" className={classes.container}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <BookingForm
+                    cinemas={uniqueCinemas}
+                    times={uniqueTimes}
+                    showtimes={showtimes}
+                    selectedCinema={selectedCinema}
+                    selectedDate={selectedDate}
+                    selectedTime={selectedTime}
+                    onChangeCinema={this.onChangeCinema}
+                    onChangeDate={this.onChangeDate}
+                    onChangeTime={this.onChangeTime}
+                    onShowSeatSelection={this.onShowSeatSelection}
+                  />
+                </Grid>
+              </Grid>
+              <ResponsiveDialog
+                id="Edit-cinema"
+                open={showLoginPopup}
+                handleClose={() => toggleLoginPopup()}
+                maxWidth="sm">
+                <LoginForm />
+              </ResponsiveDialog>
+            </Container>
+          </>
+        )}
+      </div>
     );
   }
 }

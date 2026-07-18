@@ -5,10 +5,16 @@ import { withStyles, Box, Grid } from '@material-ui/core';
 import {
   getMovies,
   getShowtimes,
-  getMovieSuggestion
+  getMovieSuggestion,
+  getCinemas
 } from '../../../store/actions';
 import MovieCarousel from '../components/MovieCarousel/MovieCarousel';
 import MovieBanner from '../components/MovieBanner/MovieBanner';
+import Experiences from '../components/Experiences/Experiences';
+import Offers from '../components/Offers/Offers';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import styles from './styles';
 
 class HomePage extends Component {
@@ -17,12 +23,15 @@ class HomePage extends Component {
       movies,
       showtimes,
       suggested,
+      cinemas,
       getMovies,
       getShowtimes,
       getMovieSuggestion,
+      getCinemas,
       user
     } = this.props;
     if (!movies.length) getMovies();
+    if (!cinemas.length) getCinemas();
     if (!showtimes.length) getShowtimes();
     if (user) {
       if (!suggested.length) getMovieSuggestion(user.username);
@@ -39,20 +48,38 @@ class HomePage extends Component {
   render() {
     const {
       classes,
-      randomMovie,
+      movies,
       comingSoon,
       nowShowing,
-      suggested
+      suggested,
+      cinemas
     } = this.props;
+
+    const bannerSettings = {
+      dots: true,
+      infinite: true,
+      speed: 1000,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      pauseOnHover: false,
+      arrows: false
+    };
+
     return (
       <Fragment>
-        <MovieBanner movie={randomMovie} height="85vh" />
+        {movies && movies.length > 0 && (
+          <Slider {...bannerSettings}>
+            {movies.map(movie => (
+              <div key={movie._id}>
+                <MovieBanner movie={movie} height="85vh" />
+              </div>
+            ))}
+          </Slider>
+        )}
         <Box height={60} />
-        <MovieCarousel
-          carouselClass={classes.carousel}
-          title="Suggested for you"
-          movies={suggested}
-        />
+
         <MovieCarousel
           carouselClass={classes.carousel}
           title="Now Showing"
@@ -65,6 +92,24 @@ class HomePage extends Component {
           to="/movie/category/comingSoon"
           movies={comingSoon}
         />
+        {cinemas && cinemas.length > 0 && (
+          <div className={classes.cinemaSection}>
+            <MovieCarousel
+              carouselClass={classes.carousel}
+              title="Featured Cinemas"
+              type="cinema"
+              to="/cinemas"
+              movies={cinemas.map(c => ({
+                ...c,
+                title: c.name,
+                image: c.image,
+                linkUrl: '/cinemas'
+              }))}
+            />
+          </div>
+        )}
+        <Experiences />
+        <Offers />
         {false && (
           <Grid container style={{ height: 500 }}>
             <Grid item xs={7} style={{ background: '#131334' }}></Grid>
@@ -84,7 +129,7 @@ HomePage.propTypes = {
   latestMovies: PropTypes.array.isRequired
 };
 
-const mapStateToProps = ({ movieState, showtimeState, authState }) => ({
+const mapStateToProps = ({ movieState, showtimeState, cinemaState, authState }) => ({
   movies: movieState.movies,
   randomMovie: movieState.randomMovie,
   latestMovies: movieState.latestMovies,
@@ -92,10 +137,11 @@ const mapStateToProps = ({ movieState, showtimeState, authState }) => ({
   nowShowing: movieState.nowShowing,
   showtimes: showtimeState.showtimes,
   suggested: movieState.suggested,
+  cinemas: cinemaState.cinemas,
   user: authState.user
 });
 
-const mapDispatchToProps = { getMovies, getShowtimes, getMovieSuggestion };
+const mapDispatchToProps = { getMovies, getShowtimes, getMovieSuggestion, getCinemas };
 
 export default connect(
   mapStateToProps,

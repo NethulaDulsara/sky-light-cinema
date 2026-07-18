@@ -7,6 +7,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
 import MovieCardSimple from '../MovieCardSimple/MovieCardSimple';
+import CinemaCard from '../CinemaCard/CinemaCard';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -31,13 +32,13 @@ function PrevArrow(props) {
   );
 }
 
-function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
+function MovieCarousel({ carouselClass, movies = [], title, to = null, type = 'movie' }) {
   const classes = useStyles();
   const settings = {
-    centerMode: true,
-    infinite: true,
+    centerMode: false,
+    infinite: movies.length > 4,
     speed: 500,
-    slidesToShow: 2,
+    slidesToShow: 4,
     swipeToSlide: true,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -45,25 +46,28 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
       {
         breakpoint: 1600,
         settings: {
-          slidesToShow: 3
+          slidesToShow: 3,
+          infinite: movies.length > 3
         }
       },
       {
         breakpoint: 1250,
         settings: {
-          slidesToShow: 2
+          slidesToShow: 2,
+          infinite: movies.length > 2
         }
       },
       {
         breakpoint: 750,
         settings: {
-          slidesToShow: 1
+          slidesToShow: 1,
+          infinite: movies.length > 1
         }
       }
     ]
   };
-  if (!movies.length) return null;
-  console.log('check latest',movies);
+  // Remove the early return so the title is always visible
+  // if (!movies.length) return null;
   return (
     <div className={carouselClass}>
       <div className={classes.container}>
@@ -79,11 +83,22 @@ function MovieCarousel({ carouselClass, movies = [], title, to = null }) {
         </Link>
       }
       </div>
-      <Slider {...settings} className={classes.slider}>
-        {movies.map((movie,i) => (
-          <MovieCardSimple key={movie._id} movie={movie} index={i} ifupcoming={title==='Coming Soon'} />
-        ))}
-      </Slider>
+      {movies.length > 0 ? (
+        <Slider {...settings} className={classes.slider}>
+          {movies.map((movie, i) => (
+            type === 'cinema' ? (
+              <CinemaCard key={movie._id} cinema={movie} />
+            ) : (
+              <MovieCardSimple key={movie._id} movie={movie} index={i} ifupcoming={title === 'Coming Soon'} />
+            )
+          ))}
+        </Slider>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '50px 0', color: 'rgba(255,255,255,0.6)' }}>
+          <Typography variant="h4">No movies available right now.</Typography>
+          <Typography variant="subtitle1">Check back later for updates!</Typography>
+        </div>
+      )}
     </div>
   );
 }

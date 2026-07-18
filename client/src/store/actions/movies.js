@@ -5,9 +5,13 @@ export const uploadMovieImage = (id, image) => async dispatch => {
   try {
     const data = new FormData();
     data.append('file', image);
+    const token = localStorage.getItem('jwtToken');
     const url = '/movies/photo/' + id;
     const response = await fetch(url, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
       body: data
     });
     const responseData = await response.json();

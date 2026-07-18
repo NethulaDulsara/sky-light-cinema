@@ -9,7 +9,9 @@ import {
   toggleDialog,
   selectShowtime,
   selectAllShowtimes,
-  deleteShowtime
+  deleteShowtime,
+  getMovies,
+  getCinemas
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
 
@@ -20,8 +22,10 @@ class ShowtimeList extends Component {
   };
 
   componentDidMount() {
-    const { showtimes, getShowtimes } = this.props;
+    const { showtimes, getShowtimes, movies, getMovies, cinemas, getCinemas } = this.props;
     if (!showtimes.length) getShowtimes();
+    if (!movies.length) getMovies();
+    if (!cinemas.length) getCinemas();
   }
 
   handleDeleteShowtime = () => {
@@ -37,7 +41,9 @@ class ShowtimeList extends Component {
       openDialog,
       toggleDialog,
       selectShowtime,
-      selectAllShowtimes
+      selectAllShowtimes,
+      movies,
+      cinemas
     } = this.props;
 
     return (
@@ -57,6 +63,8 @@ class ShowtimeList extends Component {
               selectedShowtimes={selectedShowtimes}
               selectAllShowtimes={selectAllShowtimes}
               showtimes={showtimes}
+              movies={movies}
+              cinemas={cinemas}
             />
           )}
         </div>
@@ -75,10 +83,12 @@ class ShowtimeList extends Component {
   }
 }
 
-const mapStateToProps = ({ showtimeState }) => ({
+const mapStateToProps = ({ showtimeState, movieState, cinemaState }) => ({
   openDialog: showtimeState.openDialog,
   showtimes: showtimeState.showtimes,
-  selectedShowtimes: showtimeState.selectedShowtimes
+  selectedShowtimes: showtimeState.selectedShowtimes,
+  movies: movieState.movies,
+  cinemas: cinemaState.cinemas
 });
 
 const mapDispatchToProps = {
@@ -86,7 +96,9 @@ const mapDispatchToProps = {
   toggleDialog,
   selectShowtime,
   selectAllShowtimes,
-  deleteShowtime
+  deleteShowtime,
+  getMovies,
+  getCinemas
 };
 
 export default connect(

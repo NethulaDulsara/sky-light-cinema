@@ -18,7 +18,13 @@ import TabletMacIcon from '@material-ui/icons/TabletMac';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: '100%'
+    height: '100%',
+    background: 'rgba(255, 255, 255, 0.03)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: '16px',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+    color: 'rgba(255, 255, 255, 0.8)'
   },
   chartContainer: {
     position: 'relative',
@@ -34,7 +40,13 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(1)
   },
   deviceIcon: {
-    color: theme.palette.icon
+    color: 'rgba(255, 255, 255, 0.7)'
+  },
+  cardHeader: {
+    '& span': {
+      color: '#fff',
+      fontWeight: 700
+    }
   }
 }));
 
@@ -49,13 +61,12 @@ const UsersByDevice = props => {
       {
         data: [63, 15, 22],
         backgroundColor: [
-          theme.palette.primary.main,
-          theme.palette.error.main,
-          theme.palette.warning.main
+          '#00C6FF',
+          '#FF416C',
+          '#F9D423'
         ],
-        borderWidth: 8,
-        borderColor: theme.palette.white,
-        hoverBorderColor: theme.palette.white
+        borderWidth: 0,
+        hoverBorderColor: 'transparent'
       }
     ],
     labels: ['Desktop', 'Tablet', 'Mobile']
@@ -75,11 +86,11 @@ const UsersByDevice = props => {
       mode: 'index',
       intersect: false,
       borderWidth: 1,
-      borderColor: theme.palette.divider,
-      backgroundColor: theme.palette.white,
-      titleFontColor: theme.palette.text.primary,
-      bodyFontColor: theme.palette.text.secondary,
-      footerFontColor: theme.palette.text.secondary
+      borderColor: 'rgba(255,255,255,0.1)',
+      backgroundColor: 'rgba(0,0,0,0.8)',
+      titleFontColor: '#fff',
+      bodyFontColor: 'rgba(255,255,255,0.7)',
+      footerFontColor: 'rgba(255,255,255,0.7)'
     }
   };
 
@@ -88,33 +99,34 @@ const UsersByDevice = props => {
       title: 'Desktop',
       value: '63',
       icon: <LaptopMacIcon />,
-      color: theme.palette.primary.main
+      color: '#00C6FF'
     },
     {
       title: 'Tablet',
       value: '15',
       icon: <TabletMacIcon />,
-      color: theme.palette.error.main
+      color: '#FF416C'
     },
     {
       title: 'Mobile',
       value: '23',
       icon: <PhoneIphoneIcon />,
-      color: theme.palette.warning.main
+      color: '#F9D423'
     }
   ];
 
   return (
     <Card {...rest} className={classnames(classes.root, className)}>
       <CardHeader
+        className={classes.cardHeader}
         action={
-          <IconButton size="small">
+          <IconButton size="small" style={{ color: 'rgba(255,255,255,0.7)' }}>
             <RefreshIcon />
           </IconButton>
         }
         title="Users By Device"
       />
-      <Divider />
+      <Divider style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
       <CardContent>
         <div className={classes.chartContainer}>
           <Doughnut data={data} options={options} />

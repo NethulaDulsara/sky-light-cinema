@@ -23,21 +23,21 @@ export default theme => ({
     flexShrink: 0
   },
   logo: {
-    width: 'calc(100% - 160px)',
-    maxWidth: '100%',
-    margin: 'auto',
     fontFamily: 'Montserrat,sans-serif',
-    fontSize: '22px',
+    fontSize: '20px',
     fontWeight: 700,
-    letterSpacing: 3,
-    color: theme.palette.common.white
+    letterSpacing: 2,
+    color: theme.palette.common.white,
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2)
   },
   title: {
     marginLeft: theme.spacing(3),
     textTransform: 'uppercase',
     textDecoration: 'none',
     fontSize: '14px',
-    color: theme.palette.common.white
+    color: theme.palette.text.primary,
+    fontWeight: 700
   },
   menuButton: {
     color: theme.palette.common.white,

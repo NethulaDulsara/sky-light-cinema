@@ -1,6 +1,7 @@
 export default theme => ({
-  container: { height: '100%', paddingTop: theme.spacing(10) },
+  root: { paddingTop: theme.spacing(10) },
+  container: { height: '100%' },
   [theme.breakpoints.down('md')]: {
-    root: { height: '100%' }
+    root: { height: '100%', paddingTop: theme.spacing(10) }
   }
 });

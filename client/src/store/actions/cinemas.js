@@ -72,6 +72,9 @@ export const createCinemas = (image, newCinema) => async dispatch => {
       if (image) dispatch(uploadCinemaImage(cinema._id, image));
       dispatch(getCinemas());
       return { status: 'success', message: 'Cinema Created' };
+    } else {
+      dispatch(setAlert(cinema.message || 'Cinema creation failed', 'error', 5000));
+      return { status: 'error', message: cinema.message || 'Cinema creation failed' };
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
@@ -98,6 +101,10 @@ export const updateCinemas = (image, cinema, id) => async dispatch => {
       dispatch(setAlert('Cinema Updated', 'success', 5000));
       if (image) dispatch(uploadCinemaImage(id, image));
       return { status: 'success', message: 'Cinema Updated' };
+    } else {
+      const errorData = await response.json();
+      dispatch(setAlert(errorData.message || 'Cinema update failed', 'error', 5000));
+      return { status: 'error', message: errorData.message || 'Cinema update failed' };
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));

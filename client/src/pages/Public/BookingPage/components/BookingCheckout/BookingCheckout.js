@@ -1,85 +1,116 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { Box, Grid, Typography, Button } from '@material-ui/core';
+import { Box, Typography, Button } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
-  bannerTitle: {
-    fontSize: theme.spacing(1.4),
-    textTransform: 'uppercase',
-    color: 'rgb(93, 93, 97)',
-    marginBottom: theme.spacing(1)
+  footer: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    backgroundColor: '#151532',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: theme.spacing(2, 4),
+    boxShadow: '0 -4px 12px rgba(0,0,0,0.3)',
+    zIndex: 10
   },
-  bannerContent: {
-    fontSize: theme.spacing(2),
-    textTransform: 'capitalize',
-    color: theme.palette.common.white
+  legendBar: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing(4),
+    marginBottom: theme.spacing(2)
   },
-  [theme.breakpoints.down('sm')]: {
-    hideOnSmall: {
-      display: 'none'
+  legendItem: {
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '12px',
+    color: '#fff',
+    fontWeight: 600
+  },
+  legendBox: {
+    width: '16px',
+    height: '16px',
+    borderRadius: '4px',
+    marginRight: '8px'
+  },
+  buttonRow: {
+    display: 'flex',
+    gap: theme.spacing(2),
+    justifyContent: 'center',
+    width: '100%'
+  },
+  backButton: {
+    border: '2px solid #fff',
+    color: '#fff',
+    backgroundColor: 'transparent',
+    padding: '10px 40px',
+    fontWeight: 700,
+    width: '160px',
+    '&:hover': {
+      backgroundColor: 'rgba(255,255,255,0.1)'
     }
+  },
+  proceedButton: {
+    backgroundColor: '#fff',
+    color: '#151532',
+    padding: '10px 40px',
+    fontWeight: 800,
+    width: '160px',
+    '&:hover': {
+      backgroundColor: '#e6e6e6'
+    }
+  },
+  proceedDisabled: {
+    backgroundColor: '#fff !important',
+    color: '#151532 !important',
+    opacity: 0.5
   }
 }));
 
 export default function BookingCheckout(props) {
   const classes = useStyles(props);
-  const {
-    user,
-    ticketPrice,
-    selectedSeats,
-    seatsAvailable,
-    onBookSeats
-  } = props;
+  const { selectedSeats, onBookSeats, onHideSeatSelection, ticketCount } = props;
+
+  const isProceedDisabled = selectedSeats !== ticketCount;
 
   return (
-    <Box marginTop={2} bgcolor="rgb(18, 20, 24)">
-      <Grid container>
-        <Grid item xs={8} md={10}>
-          <Grid container spacing={3} style={{ padding: 20 }}>
-            {user && user.name && (
-              <Grid item className={classes.hideOnSmall}>
-                <Typography className={classes.bannerTitle}>Name</Typography>
-                <Typography className={classes.bannerContent}>
-                  {user.name}
-                </Typography>
-              </Grid>
-            )}
-            <Grid item>
-              <Typography className={classes.bannerTitle}>Tickets</Typography>
-              {selectedSeats > 0 ? (
-                <Typography className={classes.bannerContent}>
-                  {selectedSeats} tickets
-                </Typography>
-              ) : (
-                <Typography className={classes.bannerContent}>0</Typography>
-              )}
-            </Grid>
-            <Grid item>
-              <Typography className={classes.bannerTitle}>Price</Typography>
-              <Typography className={classes.bannerContent}>
-                {ticketPrice * selectedSeats} &euro;
-              </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid
-          item
-          xs={4}
-          md={2}
-          style={{
-            color: 'rgb(120, 205, 4)',
-            background: 'black',
-            display: 'flex'
-          }}>
-          <Button
-            color="inherit"
-            fullWidth
-            disabled={seatsAvailable <= 0}
-            onClick={() => onBookSeats()}>
-            Checkout
-          </Button>
-        </Grid>
-      </Grid>
+    <Box className={classes.footer}>
+      {/* Legend */}
+      <div className={classes.legendBar}>
+        <div className={classes.legendItem}>
+          <div className={classes.legendBox} style={{ backgroundColor: '#00cc66' }}></div>
+          Selected
+        </div>
+        <div className={classes.legendItem}>
+          <div className={classes.legendBox} style={{ border: '1px solid rgba(255,255,255,0.4)' }}></div>
+          Available
+        </div>
+        <div className={classes.legendItem}>
+          <div className={classes.legendBox} style={{ backgroundColor: '#e63946' }}></div>
+          Occupied
+        </div>
+        <div className={classes.legendItem}>
+          <div className={classes.legendBox} style={{ backgroundColor: '#4a4a5a' }}></div>
+          Unavailable
+        </div>
+      </div>
+
+      {/* Buttons */}
+      <div className={classes.buttonRow}>
+        <Button className={classes.backButton} onClick={onHideSeatSelection}>
+          BACK
+        </Button>
+        <Button 
+          classes={{ root: classes.proceedButton, disabled: classes.proceedDisabled }}
+          onClick={onBookSeats}
+          disabled={isProceedDisabled}
+        >
+          PROCEED
+        </Button>
+      </div>
     </Box>
   );
 }

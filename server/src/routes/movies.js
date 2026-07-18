@@ -23,7 +23,6 @@ router.post(
   upload('movies').single('file'),
   async (req, res, next) => {
     console.log('in here');
-    const url = `${req.protocol}://${req.get('host')}`;
     const { file } = req;
     const movieId = req.params.id;
     console.log('check movie id', movieId);
@@ -38,7 +37,7 @@ router.post(
       console.log('check new', movie);
 
       if (!movie) return res.sendStatus(404);
-      movie.image = `${url}/${file.path}`;
+      movie.image = `/uploads/movies/${file.filename}`;
       await movie.save();
       res.send({ movie, file });
     } catch (e) {

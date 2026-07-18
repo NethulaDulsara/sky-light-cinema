@@ -1,106 +1,82 @@
 import React from 'react';
-import classNames from 'classnames';
-import { makeStyles } from '@material-ui/core';
-import { Typography } from '@material-ui/core';
-import { Paper } from '../../../../components';
-import { EventSeat, AttachMoney } from '@material-ui/icons';
+import PropTypes from 'prop-types';
+import { Typography, Card, CardActionArea, CardContent, CardMedia } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    maxWidth: '100%',
-    paddingBottom: theme.spacing(2),
-    cursor: 'pointer'
-  },
-  imageWrapper: {
-    height: '200px',
+  card: {
+    maxWidth: 400,
     margin: '0 auto',
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    color: '#010025',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
+    transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+    '&:hover': {
+      transform: 'translateY(-10px)',
+      boxShadow: '0 12px 40px 0 rgba(0, 229, 255, 0.6)',
+    }
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    'object-fit': 'cover'
+  media: {
+    height: 300,
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    backgroundColor: '#fff',
+    borderRadius: '16px 16px 0 0'
   },
-  details: { padding: theme.spacing(3) },
-  name: {
-    fontSize: '18px',
-    lineHeight: '21px',
-    marginTop: theme.spacing(2),
-    textTransform: 'capitalize'
+  content: {
+    padding: theme.spacing(2),
+    backgroundColor: '#010025',
+    color: '#fff',
+    textAlign: 'center'
   },
-  city: {
-    lineHeight: '16px',
-    height: theme.spacing(4),
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    color: theme.palette.text.secondary,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(2)
-  },
-  stats: {
-    display: 'flex',
-    alignItems: 'center',
-    paddingTop: theme.spacing(1),
-    paddingLeft: theme.spacing(3)
-  },
-  eventIcon: {
-    color: theme.palette.text.secondary
-  },
-  eventText: {
-    marginLeft: theme.spacing(1),
-    color: theme.palette.text.secondary
+  h5: {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    letterSpacing: '1px'
   }
 }));
 
-function CinemaCard(props) {
-  const classes = useStyles(props);
-  const { className, cinema } = props;
-  console.log(cinema);
-  const cinemaImage =
-    cinema && cinema.image
-      ? cinema.image
-      : 'https://source.unsplash.com/featured/?cinema';
+const CinemaCard = ({ cinema }) => {
+  const classes = useStyles();
 
-  const rootClassName = classNames(classes.root, className);
+  const getImageUrl = (image) => {
+    if (!image) return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c';
+    if (image.startsWith('/uploads')) {
+      return `http://localhost:8080${image}`;
+    }
+    return image;
+  };
+
   return (
-    <Paper className={rootClassName}>
-      <div className={classes.imageWrapper}>
-        <img
-          alt="cinema"
-          className={classes.image}
-          src={cinemaImage}
-          onClick={() => {
-            console.log('cinema card clicked');
-            
-          }}
-        />
-      </div>
-      <div className={classes.details}>
-        <Typography className={classes.name} variant="h4">
-          {cinema.name}
-        </Typography>
-        <Typography className={classes.city} variant="body1">
-          {cinema.city}
-        </Typography>
-      </div>
-      <div className={classes.stats}>
-        <AttachMoney className={classes.eventIcon} />
-        <Typography className={classes.eventText} variant="body2">
-          {cinema.ticketPrice} <span>&euro;</span> per movie
-        </Typography>
-      </div>
-      <div className={classes.stats}>
-        <EventSeat className={classes.eventIcon} />
-        <Typography className={classes.eventText} variant="body2">
-          {cinema.seatsAvailable} seats Available
-        </Typography>
-      </div>
-    </Paper>
+    <Link to={cinema.linkUrl || `/cinemas/${cinema._id}`} style={{ textDecoration: 'none' }}>
+      <Card className={classes.card}>
+        <CardActionArea>
+          <CardMedia
+            className={classes.media}
+            image={getImageUrl(cinema.image)}
+            title={cinema.title}
+          />
+          <CardContent className={classes.content}>
+            <Typography
+              className={classes.h5}
+              gutterBottom
+              variant="h5"
+              component="h2"
+              color="inherit"
+            >
+              {cinema.title}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Link>
   );
-}
+};
+
+CinemaCard.propTypes = {
+  cinema: PropTypes.object.isRequired
+};
 
 export default CinemaCard;

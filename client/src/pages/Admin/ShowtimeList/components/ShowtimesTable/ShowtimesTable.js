@@ -28,11 +28,15 @@ class ShowtimesTable extends Component {
     classes: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
     onShowDetails: PropTypes.func,
-    showtimes: PropTypes.array.isRequired
+    showtimes: PropTypes.array.isRequired,
+    movies: PropTypes.array.isRequired,
+    cinemas: PropTypes.array.isRequired
   };
 
   static defaultProps = {
     showtimes: [],
+    movies: [],
+    cinemas: [],
     onSelect: () => {},
     onShowDetails: () => {}
   };
@@ -52,7 +56,9 @@ class ShowtimesTable extends Component {
       showtimes,
       onSelectShowtime,
       selectedShowtimes,
-      selectAllShowtimes
+      selectAllShowtimes,
+      movies,
+      cinemas
     } = this.props;
     const { rowsPerPage, page } = this.state;
 
@@ -112,10 +118,10 @@ class ShowtimesTable extends Component {
                       </div>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {showtime.movieId}
+                      {movies.find(m => m._id === showtime.movieId)?.title || showtime.movieId}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {showtime.cinemaId}
+                      {cinemas.find(c => c._id === showtime.cinemaId)?.name || showtime.cinemaId}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {moment(showtime.startDate).format('DD/MM/YYYY')}

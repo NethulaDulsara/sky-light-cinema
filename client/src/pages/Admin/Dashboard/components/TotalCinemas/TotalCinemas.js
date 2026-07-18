@@ -8,23 +8,42 @@ import TheatersIcon from '@material-ui/icons/Theaters';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: '100%'
+    height: '100%',
+    background: 'rgba(255, 255, 255, 0.03)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: '16px',
+    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    '&:hover': {
+      transform: 'translateY(-5px)',
+      boxShadow: '0 12px 40px 0 rgba(0, 0, 0, 0.5)',
+    }
   },
   content: {
     alignItems: 'center',
     display: 'flex'
   },
   title: {
-    fontWeight: 700
+    fontWeight: 700,
+    color: 'rgba(255,255,255,0.7)',
+    letterSpacing: '1px'
+  },
+  value: {
+    fontWeight: 800,
+    color: '#fff',
+    marginTop: theme.spacing(1)
   },
   avatar: {
-    backgroundColor: theme.palette.error.main,
+    background: 'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)',
     height: 56,
-    width: 56
+    width: 56,
+    boxShadow: '0 4px 20px 0 rgba(255, 75, 43, 0.4)'
   },
   icon: {
     height: 32,
-    width: 32
+    width: 32,
+    color: '#fff'
   },
   difference: {
     marginTop: theme.spacing(2),
@@ -32,11 +51,15 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center'
   },
   differenceIcon: {
-    color: theme.palette.error.dark
+    color: '#ff1744'
   },
   differenceValue: {
-    color: theme.palette.error.dark,
-    marginRight: theme.spacing(1)
+    color: '#ff1744',
+    marginRight: theme.spacing(1),
+    fontWeight: 'bold'
+  },
+  caption: {
+    color: 'rgba(255,255,255,0.5)'
   }
 }));
 
@@ -52,12 +75,11 @@ const TotalCinemas = props => {
           <Grid item>
             <Typography
               className={classes.title}
-              color="textSecondary"
               gutterBottom
               variant="body2">
               TOTAL CINEMAS
             </Typography>
-            <Typography variant="h3">{cinemas}</Typography>
+            <Typography className={classes.value} variant="h3">{cinemas}</Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { withStyles, Grid } from '@material-ui/core';
+import { withStyles, Grid, Typography } from '@material-ui/core';
 import {
   TotalUsers,
   TotalCinemas,
@@ -18,8 +18,26 @@ import {
 
 const styles = theme => ({
   root: {
-    textAlign: 'center',
-    padding: theme.spacing(4)
+    padding: theme.spacing(4),
+    background: 'radial-gradient(circle at 10% 20%, rgba(30,30,40,1) 0%, rgba(18,18,24,1) 90%)',
+    minHeight: '100vh',
+    color: theme.palette.common.white,
+  },
+  header: {
+    marginBottom: theme.spacing(5),
+    textAlign: 'left',
+  },
+  greeting: {
+    fontWeight: 800,
+    background: '-webkit-linear-gradient(45deg, #FF6B6B 30%, #FF8E53 90%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    letterSpacing: '1px'
+  },
+  subtitle: {
+    color: theme.palette.text.secondary,
+    marginTop: theme.spacing(1),
+    fontWeight: 500
   }
 });
 
@@ -62,6 +80,14 @@ class Dashboard extends Component {
 
     return (
       <div className={classes.root}>
+        <div className={classes.header}>
+          <Typography variant="h3" className={classes.greeting}>
+            Admin Overview
+          </Typography>
+          <Typography variant="subtitle1" className={classes.subtitle}>
+            Welcome back! Here's what's happening today.
+          </Typography>
+        </div>
         <Grid container spacing={4}>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
             <TotalUsers users={users.length} />
