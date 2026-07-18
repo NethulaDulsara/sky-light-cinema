@@ -31,13 +31,15 @@ import BookingForm from './components/BookingForm/BookingForm';
 import BookingSeats from './components/BookingSeats/BookingSeats';
 import BookingCheckout from './components/BookingCheckout/BookingCheckout';
 import BookingInvitation from './components/BookingInvitation/BookingInvitation';
+import TicketTypeModal from './components/TicketTypeModal/TicketTypeModal';
 
 import jsPDF from 'jspdf';
 
 class BookingPage extends Component {
   state = {
     isSeatSelectionVisible: false,
-    ticketCount: 1
+    ticketCount: 1,
+    isTicketTypeModalOpen: false
   };
 
   didSetSuggestion = false;
@@ -119,7 +121,18 @@ class BookingPage extends Component {
     setSelectedSeats([row, seat]);
   };
 
-  async checkout() {
+  onOpenTicketTypeModal = () => {
+    const { isAuth, toggleLoginPopup } = this.props;
+    if (!isAuth) return toggleLoginPopup();
+    
+    this.setState({ isTicketTypeModalOpen: true });
+  };
+
+  onCloseTicketTypeModal = () => {
+    this.setState({ isTicketTypeModalOpen: false });
+  };
+
+  async checkout(adultCount, childCount) {
     const {
       movie,
       cinema,
@@ -138,12 +151,18 @@ class BookingPage extends Component {
     if (selectedSeats.length === 0) return;
     if (!isAuth) return toggleLoginPopup();
 
+    const adultPrice = cinema.ticketPrice;
+    const childPrice = adultPrice - 100;
+    const totalPrice = (adultCount * adultPrice) + (childCount * childPrice);
+
+    this.setState({ isTicketTypeModalOpen: false });
+
     const response = await addReservation({
       date: selectedDate,
       startAt: selectedTime,
       seats: this.bookSeats(),
-      ticketPrice: cinema.ticketPrice,
-      total: selectedSeats.length * cinema.ticketPrice,
+      ticketPrice: cinema.ticketPrice, // Note: backend might still expect a single price for schema, but we pass total correctly
+      total: totalPrice,
       movieId: movie._id,
       cinemaId: cinema._id,
       username: user.username,
@@ -405,10 +424,19 @@ class BookingPage extends Component {
       });
     }
 
-    const { isSeatSelectionVisible, ticketCount } = this.state;
+    const { isSeatSelectionVisible, ticketCount, isTicketTypeModalOpen } = this.state;
 
     return (
       <div className={classes.root}>
+        {cinema && (
+          <TicketTypeModal
+            open={isTicketTypeModalOpen}
+            onClose={this.onCloseTicketTypeModal}
+            totalTickets={selectedSeats.length}
+            adultPrice={cinema.ticketPrice}
+            onProceed={(adult, child) => this.checkout(adult, child)}
+          />
+        )}
         {isSeatSelectionVisible ? (
           <>
             {cinema && selectedCinema && selectedTime && !showInvitation && (
@@ -430,7 +458,7 @@ class BookingPage extends Component {
                   selectedSeats={selectedSeats.length}
                   ticketCount={ticketCount}
                   onHideSeatSelection={this.onHideSeatSelection}
-                  onBookSeats={() => this.checkout()}
+                  onBookSeats={this.onOpenTicketTypeModal}
                 />
               </div>
             )}
