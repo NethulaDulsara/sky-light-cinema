@@ -32,6 +32,7 @@ import BookingSeats from './components/BookingSeats/BookingSeats';
 import BookingCheckout from './components/BookingCheckout/BookingCheckout';
 import BookingInvitation from './components/BookingInvitation/BookingInvitation';
 import TicketTypeModal from './components/TicketTypeModal/TicketTypeModal';
+import TermsAndConditionsModal from './components/TermsAndConditionsModal/TermsAndConditionsModal';
 
 import jsPDF from 'jspdf';
 
@@ -39,7 +40,9 @@ class BookingPage extends Component {
   state = {
     isSeatSelectionVisible: false,
     ticketCount: 1,
-    isTicketTypeModalOpen: false
+    isTicketTypeModalOpen: false,
+    isTermsModalOpen: false,
+    pendingCheckout: null
   };
 
   didSetSuggestion = false;
@@ -122,14 +125,31 @@ class BookingPage extends Component {
   };
 
   onOpenTicketTypeModal = () => {
-    const { isAuth, toggleLoginPopup } = this.props;
-    if (!isAuth) return toggleLoginPopup();
-    
     this.setState({ isTicketTypeModalOpen: true });
   };
 
   onCloseTicketTypeModal = () => {
     this.setState({ isTicketTypeModalOpen: false });
+  };
+
+  onProceedTicketTypeModal = (adultCount, childCount) => {
+    this.setState({
+      isTicketTypeModalOpen: false,
+      isTermsModalOpen: true,
+      pendingCheckout: { adultCount, childCount }
+    });
+  };
+
+  onCloseTermsModal = () => {
+    this.setState({ isTermsModalOpen: false, pendingCheckout: null });
+  };
+
+  onAgreeTermsModal = () => {
+    const { pendingCheckout } = this.state;
+    if (pendingCheckout) {
+      this.checkout(pendingCheckout.adultCount, pendingCheckout.childCount);
+    }
+    this.setState({ isTermsModalOpen: false, pendingCheckout: null });
   };
 
   async checkout(adultCount, childCount) {
@@ -149,7 +169,6 @@ class BookingPage extends Component {
     } = this.props;
 
     if (selectedSeats.length === 0) return;
-    if (!isAuth) return toggleLoginPopup();
 
     const adultPrice = cinema.ticketPrice;
     const childPrice = adultPrice - 100;
@@ -165,32 +184,37 @@ class BookingPage extends Component {
       total: totalPrice,
       movieId: movie._id,
       cinemaId: cinema._id,
-      username: user.username,
-      phone: user.phone
+      username: 'Guest',
+      email: 'guest@example.com',
+      phone: '0000000000'
     });
     if (response.status === 'success') {
       const { data } = response;
       setQRCode(data.QRCode);
       getReservations();
-      showInvitationForm();
+      
+      this.props.history.push({
+        pathname: '/payment/' + data.reservation._id,
+        state: {
+          movieTitle: movie.title,
+          cinemaName: cinema.name,
+          date: selectedDate,
+          time: selectedTime,
+          seats: this.bookSeats(),
+          totalPrice,
+          adultCount,
+          childCount
+        }
+      });
     }
   }
 
   bookSeats() {
-    const { cinema, selectedSeats } = this.props;
-    const seats = [...cinema.seats];
-
-    if (selectedSeats.length === 0) return;
-
-    const bookedSeats = seats
-      .map(row =>
-        row.map((seat, i) => (seat === 2 ? i : -1)).filter(seat => seat !== -1)
-      )
-      .map((seats, i) => (seats.length ? seats.map(seat => [i, seat]) : -1))
-      .filter(seat => seat !== -1)
-      .reduce((a, b) => a.concat(b));
-
-    return bookedSeats;
+    const { selectedSeats } = this.props;
+    if (!selectedSeats || selectedSeats.length === 0) return [];
+    
+    // selectedSeats is already an array of [row, seat] pairs, so we can just return it.
+    return selectedSeats;
   }
 
   onFilterCinema() {
@@ -424,7 +448,7 @@ class BookingPage extends Component {
       });
     }
 
-    const { isSeatSelectionVisible, ticketCount, isTicketTypeModalOpen } = this.state;
+    const { isSeatSelectionVisible, ticketCount, isTicketTypeModalOpen, isTermsModalOpen } = this.state;
 
     return (
       <div className={classes.root}>
@@ -434,9 +458,23 @@ class BookingPage extends Component {
             onClose={this.onCloseTicketTypeModal}
             totalTickets={selectedSeats.length}
             adultPrice={cinema.ticketPrice}
-            onProceed={(adult, child) => this.checkout(adult, child)}
+            onProceed={this.onProceedTicketTypeModal}
           />
         )}
+        {cinema && (
+          <TermsAndConditionsModal
+            open={isTermsModalOpen}
+            onClose={this.onCloseTermsModal}
+            onAgree={this.onAgreeTermsModal}
+          />
+        )}
+        <ResponsiveDialog
+          id="Edit-cinema"
+          open={showLoginPopup}
+          handleClose={() => toggleLoginPopup()}
+          maxWidth="sm">
+          <LoginForm />
+        </ResponsiveDialog>
         {isSeatSelectionVisible ? (
           <>
             {cinema && selectedCinema && selectedTime && !showInvitation && (
@@ -493,13 +531,6 @@ class BookingPage extends Component {
                   />
                 </Grid>
               </Grid>
-              <ResponsiveDialog
-                id="Edit-cinema"
-                open={showLoginPopup}
-                handleClose={() => toggleLoginPopup()}
-                maxWidth="sm">
-                <LoginForm />
-              </ResponsiveDialog>
             </Container>
           </>
         )}

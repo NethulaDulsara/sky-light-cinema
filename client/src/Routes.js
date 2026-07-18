@@ -28,6 +28,7 @@ const MovieCategoryPage = lazy(() =>
 );
 const CinemasPage = lazy(() => import('./pages/Public/CinemasPage'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
+const PaymentPage = lazy(() => import('./pages/Public/PaymentPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
 
@@ -83,6 +84,13 @@ const Routes = () => {
             layout={PublicLayout}
             layoutProps={{ withFooter: false }}
             component={BookingPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/payment/:reservationId"
+            layout={PublicLayout}
+            layoutProps={{ withFooter: false }}
+            component={PaymentPage}
           />
           <ProtectedRoute
             exact

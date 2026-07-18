@@ -85,9 +85,13 @@ export const facebookLogin = e => async dispatch => {
   }
 };
 
-export const googleLogin = ({ profileObj }) => async dispatch => {
+export const googleLogin = (response) => async dispatch => {
+  if (!response || !response.profileObj) {
+    console.error('Google login failed or cancelled', response);
+    return;
+  }
   try {
-    const { email, googleId, name } = profileObj;
+    const { email, googleId, name } = response.profileObj;
     const options = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -7,7 +7,7 @@ const generateQR = require('../utils/generateQRCode');
 const router = new express.Router();
 
 // Create a reservation
-router.post('/reservations', auth.simple, async (req, res) => {
+router.post('/reservations', async (req, res) => {
   const reservation = new Reservation(req.body);
 
   const QRCode = await generateQR(`https://razorpay.com`);
@@ -21,7 +21,7 @@ router.post('/reservations', auth.simple, async (req, res) => {
 });
 
 // Get all reservations
-router.get('/reservations', auth.simple, async (req, res) => {
+router.get('/reservations', async (req, res) => {
   try {
     const reservations = await Reservation.find({});
     res.send(reservations);
@@ -55,7 +55,7 @@ router.get('/reservations/checkin/:id', async (req, res) => {
 });
 
 // Update reservation by id
-router.patch('/reservations/:id', auth.enhance, async (req, res) => {
+router.patch('/reservations/:id', async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
   const allowedUpdates = [
@@ -65,6 +65,7 @@ router.patch('/reservations/:id', auth.enhance, async (req, res) => {
     'ticketPrice',
     'total',
     'username',
+    'email',
     'phone',
     'checkin',
   ];
