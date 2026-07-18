@@ -1,5 +1,5 @@
 {
-  "name": "moviestore",
+  "name": "sky-light-cinema",
   "version": "1.0.0",
   "description": "",
   "main": "server/src/index.js",
@@ -11,12 +11,12 @@
   },
   
   "keywords": [],
-  "author": "Charan",
+  "author": "NethulaDulsara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/georgesimos/cinema-plus/issues"
+    "url": "https://github.com/NethulaDulsara/sky-light-cinema/issues"
   },
-  "homepage": "https://github.com/georgesimos/cinema-plus#readme",
+  "homepage": "https://github.com/NethulaDulsara/sky-light-cinema#readme",
   "devDependencies": {
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",

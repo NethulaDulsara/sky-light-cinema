@@ -1,5 +1,5 @@
 {
-  "name": "moviestore-server",
+  "name": "sky-light-cinema-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "database": "/Users/georgesimos/mongodb/bin/mongod --dbpath=/Users/georgesimos//mongodb-data"
   },
-  "author": "charan",
+  "author": "NethulaDulsara",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",

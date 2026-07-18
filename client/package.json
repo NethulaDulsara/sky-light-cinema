@@ -1,8 +1,8 @@
 {
-  "name": "moviestore-client",
+  "name": "sky-light-cinema-client",
   "version": "0.1.0",
   "private": true,
-  "author": "charan",
+  "author": "NethulaDulsara",
   "license": "MIT",
   "dependencies": {
     "@date-io/moment": "1.3.11",

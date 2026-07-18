@@ -2,7 +2,7 @@
     <img src="Assets/2024-08-17-23-31-55.png" align="center" height="150"></img>
 </p>
 
-<h1 align="center"> Movie Store 🛒📽️ </h1> 
+<h1 align="center"> Sky Light Cinema 🛒📽️ </h1> 
 <h3 align="center"> Seamlessly book your movie tickets anytime, anywhere with our smart and dynamic booking platform! </h3>
 
 <p align="center">
@@ -145,26 +145,10 @@
   <tbody>
     <tr>
       <td align="center">
-        <a href="https://github.com/charangajjala" target="_blank">
-          <img src="https://avatars.githubusercontent.com/u/64437927?v=4" width="100px" alt="Charan Gajjala" />
+        <a href="https://github.com/NethulaDulsara" target="_blank">
+          <img src="https://avatars.githubusercontent.com/u/1?v=4" width="100px" alt="NethulaDulsara" />
           <br />
-          <sub><b>Charan Gajjala Chenchu</b></sub>
-        </a>
-      </td>
-      <td align="center">
-        <a href="https://www.linkedin.com/in/chinna-hari-krishna-reddy-708536245/"
-          target="_blank">
-          <img src="https://avatars.githubusercontent.com/u/74588553?v=4" width="100px" alt="Sachin" />
-          <br />
-          <sub><b>Chinna Hari Krishna</b></sub>
-        </a>
-      </td>
-            <td align="center">
-        <a href="https://www.linkedin.com/in/sree-ram-varma-chintalapati-37092a1a9/"
-          target="_blank">
-          <img src="https://avatars.githubusercontent.com/u/74588553?v=4" width="100px" alt="Sachin" />
-          <br />
-          <sub><b>Chitalapati Sree Ram Varama</b></sub>
+          <sub><b>NethulaDulsara</b></sub>
         </a>
       </td>
   </tbody>
