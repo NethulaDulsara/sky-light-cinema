@@ -52,44 +52,6 @@
      npm run server
     ```
 
-# ▶️ App Features
-
-## 🎬 User Page
-- **Browse Movies**: Users can easily explore a vast collection of movies based on genres, languages, and release dates.
-  ![](Assets/2024-08-17-23-14-57.png)
-  ![](Assets/2024-08-17-23-10-25.png)
-
-
-- **Select Showtimes**: Choose preferred showtimes and cinema locations based on availability.
-  ![](Assets/2024-08-17-23-11-42.png)
-
-- **Seat Selection**: View the seating arrangement and select desired seats in real-time.
-  ![](Assets/2024-08-17-23-12-24.png)
-
-- **Booking Confirmation**: Receive booking confirmation with a summary of selected seats, showtime, and cinema location.
-  ![](Assets/2024-08-17-23-13-13.png)
-
-- **User Dashboard **: Secure login and registration for users, check reservation history, and manage personal information.
-  ![](Assets/2024-08-17-23-15-55.png)
-
-
-## 🎟️ Admin Dashboard
-- **Dashboard for Theatre Owners**: Theatre admins can manage their cinema information, view reservations, and analyze booking statistics.
-  
-- **Add Movies**: Admins can easily add new movies to their cinemas and manage showtimes and seat availability.
-  ![](Assets/2024-08-17-23-18-30.png)
-  ![](Assets/2024-08-17-23-18-44.png)
-  ![](Assets/2024-08-17-23-19-35.png)
-- **Reservation Management**: Admins can track all bookings, manage seat statuses, and handle ticket cancellations.
-  ![](Assets/2024-08-17-23-20-00.png)
-  ![](Assets/2024-08-17-23-20-18.png)
-- **Business Analytics**: Admin dashboard provides rich visualizations and statistical insights into bookings, sales, and customer behavior.
-  ![](Assets/2024-08-17-23-18-10.png)
-
-## 💳 Future Scope
-- **Payment Integration**: Integration with payment gateways to facilitate online transactions for booking tickets.
-- **Customer Reviews**: Allow users to leave reviews and feedback for movies they have watched.
-- **Offers & Promotions**: Admins can create and manage promotional offers for movie bookings.
 
 # Tech Stack 📃
 - **Frontend**: React.js with Material-UI for creating a responsive and dynamic user interface.
@@ -139,20 +101,6 @@
 - **Admin Management**: Super Admins have additional privileges to approve theatre owners as Admins.
 - **Analytics**: The admin dashboard includes graphical visualizations to track revenue, movie popularity, and user engagement.
 
-# Contributors <img src="https://raw.githubusercontent.com/TheDudeThatCode/TheDudeThatCode/master/Assets/Developer.gif" width=35 height=25>
-
-<table>
-  <tbody>
-    <tr>
-      <td align="center">
-        <a href="https://github.com/NethulaDulsara" target="_blank">
-          <img src="https://avatars.githubusercontent.com/u/1?v=4" width="100px" alt="NethulaDulsara" />
-          <br />
-          <sub><b>NethulaDulsara</b></sub>
-        </a>
-      </td>
-  </tbody>
-</table>
 
 # 🎟️ License
 
