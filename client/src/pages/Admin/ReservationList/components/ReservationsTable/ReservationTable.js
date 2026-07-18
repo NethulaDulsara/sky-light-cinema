@@ -51,6 +51,11 @@ class ReservationsTable extends Component {
     return item ? item[attr] : `Not ${attr} Found`;
   };
 
+  getCreatedAt = (reservation) => {
+    if (reservation.createdAt) return new Date(reservation.createdAt);
+    return new Date(parseInt(reservation._id.substring(0, 8), 16) * 1000);
+  };
+
   render() {
     const { classes, className, reservations, movies, cinemas } = this.props;
     const { rowsPerPage, page } = this.state;
@@ -64,6 +69,7 @@ class ReservationsTable extends Component {
               <TableRow>
                 <TableCell align="left">User</TableCell>
                 <TableCell align="left">Phone</TableCell>
+                <TableCell align="left">Purchased At</TableCell>
                 <TableCell align="left">Start At</TableCell>
                 <TableCell align="left">Movie</TableCell>
                 <TableCell align="left">Cinema</TableCell>
@@ -74,7 +80,7 @@ class ReservationsTable extends Component {
             </TableHead>
             <TableBody>
               {reservations
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .sort((a, b) => this.getCreatedAt(b) - this.getCreatedAt(a))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(reservation => (
                   <TableRow
@@ -86,6 +92,9 @@ class ReservationsTable extends Component {
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.phone}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {this.getCreatedAt(reservation).toLocaleString()}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.startAt}

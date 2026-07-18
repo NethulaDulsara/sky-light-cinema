@@ -241,7 +241,7 @@ class PaymentPage extends Component {
 
   handlePayment = async () => {
     const { formData, agreedToTerms } = this.state;
-    const { setAlert } = this.props;
+    const { match, updateReservation, setAlert, history, location } = this.props;
     
     if (!formData.name || !formData.email || !formData.mobile) {
       return setAlert('Please fill in all details', 'error', 3000);
@@ -250,30 +250,74 @@ class PaymentPage extends Component {
       return setAlert('Please agree to the Terms & Conditions', 'error', 3000);
     }
 
-    // Open Mock Payment Gateway instead of submitting immediately
-    this.setState({ isMockGatewayOpen: true });
-  };
-
-  processActualPayment = async () => {
-    const { formData } = this.state;
-    const { match, updateReservation, setAlert, history } = this.props;
-
     const reservationId = match.params.reservationId;
     
-    // Update reservation with guest details
+    // 1. Update reservation with guest details first
     const result = await updateReservation({
       username: formData.name,
       email: formData.email,
       phone: formData.mobile
     }, reservationId);
 
-    this.setState({ isMockGatewayOpen: false });
+    if (!result || result.status !== 'success') {
+      return setAlert('Failed to update booking details. Please try again.', 'error', 5000);
+    }
 
-    if (result && result.status === 'success') {
-      setAlert('Payment Successful & Booking Confirmed!', 'success', 5000);
-      history.push('/');
-    } else {
-      setAlert('Failed to confirm booking, please try again.', 'error', 5000);
+    // 2. Fetch the secure hash from the backend
+    const totalPrice = location.state.totalPrice;
+    try {
+      const response = await fetch('/reservations/payhere/hash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: reservationId,
+          amount: totalPrice,
+          currency: 'LKR'
+        })
+      });
+      const data = await response.json();
+
+      // 3. Setup PayHere object
+      const payment = {
+        sandbox: true,
+        merchant_id: data.merchant_id,
+        return_url: window.location.origin,
+        cancel_url: window.location.origin,
+        notify_url: 'http://localhost:8080/reservations/payhere/notify', // Localhost won't receive webhooks from outside, but works for frontend flow
+        order_id: reservationId,
+        items: 'Movie Tickets',
+        amount: parseFloat(totalPrice).toFixed(2),
+        currency: 'LKR',
+        hash: data.hash,
+        first_name: formData.name.split(' ')[0] || 'Guest',
+        last_name: formData.name.split(' ').slice(1).join(' ') || 'User',
+        email: formData.email,
+        phone: formData.mobile,
+        address: 'No 1, Galle Road',
+        city: 'Colombo',
+        country: 'Sri Lanka'
+      };
+
+      // 4. Handle Callbacks
+      window.payhere.onCompleted = function onCompleted(orderId) {
+        setAlert('Payment Successful & Booking Confirmed!', 'success', 5000);
+        history.push('/');
+      };
+
+      window.payhere.onDismissed = function onDismissed() {
+        setAlert('Payment popup closed by user', 'error', 3000);
+      };
+
+      window.payhere.onError = function onError(error) {
+        setAlert('Error processing payment: ' + error, 'error', 3000);
+      };
+
+      // 5. Start Checkout
+      window.payhere.startPayment(payment);
+
+    } catch (e) {
+      console.error("Payment initiation error:", e);
+      setAlert(`Error: ${e.message}`, 'error', 5000);
     }
   };
 
@@ -466,12 +510,6 @@ class PaymentPage extends Component {
             </Grid>
           </Grid>
         </Container>
-        <MockPaymentGateway 
-          open={this.state.isMockGatewayOpen} 
-          onClose={() => this.setState({ isMockGatewayOpen: false })}
-          amount={totalPrice}
-          onSuccess={this.processActualPayment}
-        />
       </div>
     );
   }

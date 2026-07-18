@@ -48,7 +48,7 @@ const reservationSchema = new Schema({
     type: Boolean,
     default: false,
   },
-});
+}, { timestamps: true });
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
