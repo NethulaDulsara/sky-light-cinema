@@ -61,7 +61,17 @@ export default function MovieInfo(props) {
 
   if (!movie) return <h1>Movie Loading...</h1>;
 
-  const imageUrl = movie.image ? (movie.image.startsWith('/uploads') ? `http://localhost:8080${movie.image}` : movie.image) : images[movie.title];
+  let rawImageUrl = '';
+  if (movie.image && movie.image.startsWith('/uploads')) {
+    rawImageUrl = `http://localhost:8080${movie.image}`;
+  } else if (movie.image) {
+    rawImageUrl = movie.image;
+  } else if (movie.title && images[movie.title.toLowerCase()]) {
+    rawImageUrl = images[movie.title.toLowerCase()];
+  } else {
+    rawImageUrl = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+  }
+  const imageUrl = encodeURI(rawImageUrl);
   const durationStr = movie.duration ? `${Math.floor(movie.duration / 60)}h ${movie.duration % 60}min` : '';
 
   return (

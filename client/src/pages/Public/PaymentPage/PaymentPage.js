@@ -9,6 +9,31 @@ import { setAlert } from '../../../store/actions/alert';
 import { updateReservation } from '../../../store/actions/reservations';
 import MockPaymentGateway from './components/MockPaymentGateway/MockPaymentGateway';
 
+const MastercardLogo = () => (
+  <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="36" height="24" rx="4" fill="#FFFFFF" />
+    <circle cx="13" cy="12" r="7.5" fill="#EB001B" />
+    <circle cx="23" cy="12" r="7.5" fill="#F79E1B" />
+    <path d="M18 7.3a7.4 7.4 0 00-2.7 4.7 7.4 7.4 0 002.7 4.7 7.4 7.4 0 002.7-4.7A7.4 7.4 0 0018 7.3z" fill="#FF5F00" />
+  </svg>
+);
+
+const VisaLogo = () => (
+  <svg width="44" height="24" viewBox="0 0 44 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="44" height="24" rx="4" fill="#FFFFFF" />
+    <path d="M17 6.5l-4.5 11H9.8L7.6 8.5c-.1-.5-.3-.7-.7-.9-.6-.3-1.6-.6-2.5-.8l.1-.3h4.5c.6 0 1.1.4 1.2 1l1.1 5.8 2.7-7.3H17zm10.7 7.3c0-2.6-3.6-2.8-3.6-4 0-.4.4-.7 1.2-.7.4 0 1.4 0 2.5.5l.3-1.8c-.5-.2-1.3-.3-2.1-.3-2.6 0-4.4 1.3-4.5 3.3 0 1.5 1.3 2.3 2.4 2.8 1 .5 1.4.8 1.4 1.3 0 .7-.8 1-1.7 1-1.3 0-2-.3-2.6-.6l-.3 1.8c.6.3 1.7.5 2.8.5 2.8 0 4.6-1.3 4.2-3.9zm6.7 3.5h2.4l-2.2-11h-2.2c-.5 0-1 .3-1.2.8l-4 10.2h2.7l.6-1.6h3.4l.5 1.6zm-3-3.5l1.4-3.8.7 3.8h-2.1zm-13.5-7.5l-2.2 11h-2.5l2.2-11h2.5z" fill="#1A1F71" />
+  </svg>
+);
+
+const AmexLogo = () => (
+  <svg width="34" height="24" viewBox="0 0 34 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="34" height="24" rx="4" fill="#006FCF" />
+    <text x="17" y="15" fill="#FFFFFF" fontSize="8" fontWeight="bold" fontFamily="Arial, Helvetica, sans-serif" textAnchor="middle">
+      AMEX
+    </text>
+  </svg>
+);
+
 const styles = theme => ({
   root: {
     backgroundColor: '#0a0b1a',
@@ -43,81 +68,112 @@ const styles = theme => ({
     color: '#f6b83f'
   },
   card: {
-    backgroundColor: '#fff',
-    color: '#000',
-    borderRadius: '4px',
+    backgroundColor: '#ffffff',
+    color: '#0f172a',
+    borderRadius: '12px',
     padding: theme.spacing(4),
-    marginBottom: theme.spacing(3)
+    marginBottom: theme.spacing(3),
+    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.25)',
+    border: '1px solid rgba(0, 0, 0, 0.08)'
   },
   sectionTitle: {
-    fontSize: '16px',
-    fontWeight: 700,
+    fontSize: '17px',
+    fontWeight: 800,
     textTransform: 'uppercase',
-    marginBottom: theme.spacing(1)
+    color: '#0f172a',
+    marginBottom: theme.spacing(0.5)
   },
   subText: {
-    fontSize: '12px',
-    color: '#666',
+    fontSize: '13px',
+    color: '#64748b',
     marginBottom: theme.spacing(3)
   },
   inputLabel: {
-    fontSize: '12px',
-    fontWeight: 600,
-    marginBottom: theme.spacing(0.5),
-    color: '#333'
+    fontSize: '13px',
+    fontWeight: 700,
+    marginBottom: theme.spacing(0.75),
+    color: '#1e293b'
   },
   textField: {
-    marginBottom: theme.spacing(3),
-    '& .MuiOutlinedInput-root': {
-      color: '#000',
-      '& fieldset': {
-        borderColor: '#ccc',
-      },
-      '&:hover fieldset': {
-        borderColor: '#999',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#2a265f',
-      },
+    marginBottom: theme.spacing(2.5),
+    '& .MuiInputBase-root': {
+      backgroundColor: '#f8fafc',
+      borderRadius: '8px',
+      color: '#0f172a !important'
+    },
+    '& .MuiOutlinedInput-input': {
+      color: '#0f172a !important',
+      WebkitTextFillColor: '#0f172a !important',
+      fontSize: '14px',
+      fontWeight: 600,
+      padding: '12px 14px'
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#cbd5e1 !important',
+      borderWidth: '1.5px'
+    },
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#94a3b8 !important'
+    },
+    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#2a265f !important',
+      borderWidth: '2px !important'
     },
     '& input::placeholder': {
-      color: '#888',
-      opacity: 1
+      color: '#94a3b8 !important',
+      opacity: '1 !important',
+      WebkitTextFillColor: '#94a3b8 !important',
+      fontWeight: 400
     }
+  },
+  customInput: {
+    color: '#0f172a !important',
+    WebkitTextFillColor: '#0f172a !important',
+    fontSize: '14px !important',
+    fontWeight: '600 !important'
   },
   paymentMethodContainer: {
     display: 'flex',
     gap: '16px',
-    marginBottom: theme.spacing(3)
+    marginBottom: theme.spacing(3),
+    marginTop: theme.spacing(1.5)
   },
   paymentMethodBox: {
-    border: '2px solid #ccc',
-    borderRadius: '8px',
+    border: '2px solid #e2e8f0',
+    backgroundColor: '#f8fafc',
+    borderRadius: '10px',
     padding: theme.spacing(1, 2),
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '60px',
-    width: '140px',
+    height: '62px',
+    minWidth: '150px',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      borderColor: '#94a3b8',
+      backgroundColor: '#f1f5f9'
+    },
     '&.selected': {
       borderColor: '#2a265f',
-      backgroundColor: '#f5f5ff'
+      backgroundColor: '#ede9fe',
+      boxShadow: '0 0 0 1px #2a265f'
     }
   },
   promoBox: {
-    border: '1px solid #ccc',
-    borderRadius: '4px',
+    border: '1px solid #cbd5e1',
+    borderRadius: '10px',
     padding: theme.spacing(2),
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: theme.spacing(3),
     cursor: 'pointer',
-    fontWeight: 600,
+    fontWeight: 700,
     fontSize: '14px',
     backgroundColor: '#fff',
-    color: '#000'
+    color: '#0f172a',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)'
   },
   movieTitle: {
     fontSize: '18px',
@@ -197,6 +253,13 @@ class PaymentPage extends Component {
   };
 
   componentDidMount() {
+    if (!window.payhere) {
+      const script = document.createElement('script');
+      script.src = 'https://www.payhere.lk/lib/payhere.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+
     this.timer = setInterval(() => {
       this.setState(prevState => {
         if (prevState.timeLeft <= 1) {
@@ -387,9 +450,10 @@ class PaymentPage extends Component {
                       variant="outlined" 
                       size="small" 
                       className={classes.textField}
+                      InputProps={{ classes: { input: classes.customInput } }}
                       placeholder="Enter your full name"
                       name="name"
-                      value={formData.name}
+                      value={formData.name || ''}
                       onChange={this.handleInputChange}
                     />
                   </Grid>
@@ -400,9 +464,10 @@ class PaymentPage extends Component {
                       variant="outlined" 
                       size="small" 
                       className={classes.textField}
+                      InputProps={{ classes: { input: classes.customInput } }}
                       placeholder="Enter your email address"
                       name="email"
-                      value={formData.email}
+                      value={formData.email || ''}
                       onChange={this.handleInputChange}
                     />
                   </Grid>
@@ -413,31 +478,36 @@ class PaymentPage extends Component {
                       variant="outlined" 
                       size="small" 
                       className={classes.textField}
+                      InputProps={{ classes: { input: classes.customInput } }}
                       placeholder="Enter mobile number"
                       name="mobile"
-                      value={formData.mobile}
+                      value={formData.mobile || ''}
                       onChange={this.handleInputChange}
                     />
                   </Grid>
                 </Grid>
 
-                <Typography className={classes.sectionTitle} style={{ marginTop: '16px' }}>SELECT PAYMENT METHOD</Typography>
+                <Typography className={classes.sectionTitle} style={{ marginTop: '20px' }}>SELECT PAYMENT METHOD</Typography>
                 <div className={classes.paymentMethodContainer}>
                   <div 
                     className={`${classes.paymentMethodBox} ${selectedPayment === 'visa' ? 'selected' : ''}`}
                     onClick={() => this.setState({ selectedPayment: 'visa' })}
                   >
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1200px-Mastercard-logo.svg.png" alt="Mastercard" style={{ height: '32px', marginRight: '8px', objectFit: 'contain' }} />
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Visa_Logo.png/600px-Visa_Logo.png" alt="Visa" style={{ height: '20px', objectFit: 'contain' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <MastercardLogo />
+                      <VisaLogo />
+                    </div>
                   </div>
                   <div 
                     className={`${classes.paymentMethodBox} ${selectedPayment === 'ntb' ? 'selected' : ''}`}
                     onClick={() => this.setState({ selectedPayment: 'ntb' })}
                   >
-                    <Typography style={{ fontWeight: 800, color: '#00529b', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png" alt="Amex" style={{ height: '24px', marginRight: '6px' }} />
-                      NTB Bank
-                    </Typography>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <AmexLogo />
+                      <Typography style={{ fontWeight: 800, color: '#00529b', fontSize: '13px' }}>
+                        NTB Bank
+                      </Typography>
+                    </div>
                   </div>
                 </div>
 

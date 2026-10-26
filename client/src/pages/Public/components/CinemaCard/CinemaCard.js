@@ -76,11 +76,15 @@ const CinemaCard = ({ cinema }) => {
   const classes = useStyles();
 
   const getImageUrl = image => {
-    if (!image) return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80';
-    if (image.startsWith('/uploads')) {
-      return `http://localhost:8080${image}`;
+    let url = '';
+    if (image && image.startsWith('/uploads')) {
+      url = `http://localhost:8080${image}`;
+    } else if (image) {
+      url = image;
+    } else {
+      url = 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=600&q=80';
     }
-    return image;
+    return encodeURI(url);
   };
 
   const displayName = cinema.name || cinema.title || 'Cinema Hall';
