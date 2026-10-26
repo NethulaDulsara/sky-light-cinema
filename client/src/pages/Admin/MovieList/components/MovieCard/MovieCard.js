@@ -119,13 +119,25 @@ function MovieCard(props) {
   const rootClassName = classNames(classes.root, className);
   const genreFirst = movie.genre ? movie.genre.split(',')[0].trim() : 'Movie';
 
+  const getImageUrl = (image) => {
+    let url = '';
+    if (image && image.startsWith('/uploads')) {
+      url = `http://localhost:8080${image}`;
+    } else if (image) {
+      url = image;
+    } else {
+      url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
+    }
+    return encodeURI(url);
+  };
+
   return (
     <Paper className={rootClassName}>
       <div className={classes.imageWrapper}>
         <img
           alt={movie.title}
           className={classes.image}
-          src={movie.image || 'https://via.placeholder.com/300x450?text=No+Poster'}
+          src={getImageUrl(movie.image)}
         />
         <div className={classes.imageOverlay} />
         <span className={classes.genreBadge}>{genreFirst}</span>
