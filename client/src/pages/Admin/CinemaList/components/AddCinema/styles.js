@@ -1,24 +1,43 @@
 export default theme => ({
-  root: {},
-  title: { marginLeft: theme.spacing(3) },
+  root: {
+    padding: theme.spacing(1, 0)
+  },
+  title: {
+    display: 'none'
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(2.5)
+  },
+  row: {
+    display: 'flex',
+    gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column'
+    }
+  },
   field: {
-    margin: theme.spacing(3),
-    display: 'flex'
+    width: '100%'
   },
-  textField: {
-    width: '100%',
-    marginRight: theme.spacing(3)
-  },
-  portletFooter: {
-    paddingLeft: theme.spacing(3),
-    paddingRight: theme.spacing(3),
+  actions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(2),
+    marginTop: theme.spacing(3),
     paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(2)
+    borderTop: '1px solid rgba(255, 255, 255, 0.06)'
   },
-  buttonFooter: {
-    margin: theme.spacing(3)
+  submitButton: {
+    padding: '10px 28px',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: 700
   },
-  infoMessage: {
-    marginLeft: theme.spacing(3)
+  deleteButton: {
+    padding: '10px 24px',
+    borderRadius: '12px',
+    fontSize: '14px',
+    fontWeight: 700
   }
 });

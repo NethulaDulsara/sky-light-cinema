@@ -10,7 +10,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
   TablePagination
 } from '@material-ui/core';
 
@@ -101,7 +100,7 @@ class ShowtimesTable extends Component {
                     key={showtime._id}
                     selected={selectedShowtimes.indexOf(showtime._id) !== -1}>
                     <TableCell className={classes.tableCell}>
-                      <div className={classes.tableCellInner}>
+                      <div className={classes.tableCellInner} style={{ display: 'flex', alignItems: 'center' }}>
                         <Checkbox
                           checked={
                             selectedShowtimes.indexOf(showtime._id) !== -1
@@ -110,27 +109,60 @@ class ShowtimesTable extends Component {
                           onChange={() => onSelectShowtime(showtime._id)}
                           value="true"
                         />
-                        <Typography
-                          className={classes.nameText}
-                          variant="body1">
-                          {showtime._id}
-                        </Typography>
+                        <span style={{
+                          fontFamily: 'monospace',
+                          fontSize: '11px',
+                          color: '#00C6FF',
+                          background: 'rgba(0, 198, 255, 0.08)',
+                          border: '1px solid rgba(0, 198, 255, 0.2)',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontWeight: 600
+                        }}>
+                          #{showtime._id ? showtime._id.slice(-6).toUpperCase() : ''}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {movies.find(m => m._id === showtime.movieId)?.title || showtime.movieId}
+                      {(() => {
+                        const m = movies.find(mov => mov._id === showtime.movieId);
+                        if (m && m.title) {
+                          return <span style={{ fontWeight: 600, color: '#f8fafc' }}>{m.title}</span>;
+                        }
+                        return (
+                          <span style={{ color: '#94a3b8', fontStyle: 'italic', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px' }}>
+                            Past Screening
+                          </span>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {cinemas.find(c => c._id === showtime.cinemaId)?.name || showtime.cinemaId}
+                      <span style={{ color: '#cbd5e1' }}>
+                        {cinemas.find(c => c._id === showtime.cinemaId)?.name || 'Default Hall'}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {moment(showtime.startDate).format('DD/MM/YYYY')}
+                      <span style={{ color: '#94a3b8', fontSize: '12px' }}>
+                        {moment(showtime.startDate).format('MMM DD, YYYY')}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {moment(showtime.endDate).format('DD/MM/YYYY')}
+                      <span style={{ color: '#94a3b8', fontSize: '12px' }}>
+                        {moment(showtime.endDate).format('MMM DD, YYYY')}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {showtime.startAt}
+                      <span style={{
+                        color: '#10b981',
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        border: '1px solid rgba(16, 185, 129, 0.25)',
+                        padding: '4px 10px',
+                        borderRadius: '20px',
+                        fontWeight: 700,
+                        fontSize: '12px'
+                      }}>
+                        {showtime.startAt}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -11,13 +11,15 @@ html {
 }
 
 body {
-  background: rgb(26, 26, 26);
+  background: #0a0e17;
   font-family: 'Montserrat', sans-serif;
   height: 100%;
+  color: #f8fafc;
 }
 
 a {
   text-decoration: none;
+  color: inherit;
 }
 
 #root {
@@ -25,11 +27,35 @@ a {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-/* Change Autocomplete styles in Chrome*/
+/* Custom Modern Cyberpunk Cinema Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00C6FF;
+  box-shadow: 0 0 10px rgba(0, 198, 255, 0.5);
+}
+
+::selection {
+  background: rgba(0, 198, 255, 0.35);
+  color: #ffffff;
+}
+
+/* Chrome Autocomplete styling */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -39,8 +65,8 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  border: 1px solid;
-  -webkit-text-fill-color: #fff;
-  -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset;
+  border: 1px solid rgba(0, 198, 255, 0.3);
+  -webkit-text-fill-color: #f8fafc;
+  -webkit-box-shadow: 0 0 0px 1000px #111625 inset;
   transition: background-color 5000s ease-in-out 0s;
 }

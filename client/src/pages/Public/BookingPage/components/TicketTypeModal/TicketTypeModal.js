@@ -14,83 +14,109 @@ import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 
 const useStyles = makeStyles(theme => ({
   dialogPaper: {
-    backgroundColor: '#fff',
-    color: '#000',
-    borderRadius: '16px',
-    padding: theme.spacing(3),
-    maxWidth: '450px',
+    backgroundColor: '#0f1422 !important',
+    background: 'linear-gradient(145deg, #161d31 0%, #0c101c 100%) !important',
+    color: '#f8fafc',
+    borderRadius: '20px',
+    border: '1px solid rgba(0, 198, 255, 0.25)',
+    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 198, 255, 0.12)',
+    padding: theme.spacing(3.5),
+    maxWidth: '460px',
     width: '100%',
-    fontFamily: '"Montserrat", sans-serif'
+    fontFamily: '"Montserrat", sans-serif',
+    position: 'relative',
+    overflow: 'hidden'
   },
   closeButton: {
     position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: '#fff',
-    backgroundColor: '#111',
-    padding: '4px',
+    right: theme.spacing(2),
+    top: theme.spacing(2),
+    color: '#94a3b8',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    padding: '6px',
+    transition: 'all 0.2s ease',
     '&:hover': {
-      backgroundColor: '#333'
+      backgroundColor: 'rgba(239, 68, 68, 0.2)',
+      color: '#ef4444',
+      borderColor: 'rgba(239, 68, 68, 0.4)',
+      transform: 'rotate(90deg)'
     }
   },
   closeIcon: {
     fontSize: '18px'
   },
   headerTitle: {
-    fontSize: '20px',
-    fontWeight: 400,
-    letterSpacing: '0.5px',
+    fontSize: '22px',
+    fontWeight: 700,
+    letterSpacing: '1px',
     textAlign: 'center',
     marginTop: theme.spacing(1),
-    color: '#000'
+    color: '#ffffff',
+    textTransform: 'uppercase'
   },
   subtitle: {
-    fontSize: '10px',
+    fontSize: '12px',
     textAlign: 'center',
-    color: '#888',
-    marginBottom: theme.spacing(5),
-    marginTop: theme.spacing(2)
+    color: '#94a3b8',
+    marginBottom: theme.spacing(4),
+    marginTop: theme.spacing(1),
+    letterSpacing: '0.5px'
   },
   ticketRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(0, 1)
+    marginBottom: theme.spacing(2.5),
+    padding: theme.spacing(2),
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: '12px',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+    transition: 'border-color 0.2s',
+    '&:hover': {
+      borderColor: 'rgba(0, 198, 255, 0.3)'
+    }
   },
   ticketInfo: {
     display: 'flex',
     flexDirection: 'column'
   },
   ticketTypeTitle: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#000'
+    fontSize: '15px',
+    fontWeight: 700,
+    color: '#f8fafc',
+    letterSpacing: '0.5px'
   },
   ticketPriceText: {
-    fontSize: '13px',
-    color: '#444',
+    fontSize: '14px',
+    color: '#00C6FF',
+    fontWeight: 600,
     marginTop: '4px'
   },
   counterContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px'
+    gap: '14px'
   },
   iconButton: {
     padding: 0,
-    color: '#000',
+    color: '#f8fafc',
+    transition: 'all 0.2s',
+    '&:hover': {
+      color: '#00C6FF',
+      transform: 'scale(1.1)'
+    },
     '&.Mui-disabled': {
-      color: '#ccc'
+      color: 'rgba(255, 255, 255, 0.15)'
     }
   },
   counterIcon: {
-    fontSize: '32px'
+    fontSize: '34px'
   },
   counterValue: {
     fontSize: '22px',
-    fontWeight: 700,
-    color: '#d32f2f',
+    fontWeight: 800,
+    color: '#ff4d6d',
     width: '32px',
     textAlign: 'center'
   },
@@ -101,19 +127,25 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1)
   },
   proceedButton: {
-    backgroundColor: '#39338b',
-    color: '#fff',
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072ff 100%)',
+    color: '#ffffff',
     padding: '12px 64px',
-    fontWeight: 600,
+    fontWeight: 700,
     fontSize: '14px',
-    borderRadius: '4px',
+    letterSpacing: '1px',
+    borderRadius: '10px',
     textTransform: 'uppercase',
+    boxShadow: '0 4px 20px rgba(0, 198, 255, 0.4)',
+    transition: 'all 0.2s ease',
     '&:hover': {
-      backgroundColor: '#2a2569'
+      background: 'linear-gradient(135deg, #00b4e6 0%, #0060d6 100%)',
+      boxShadow: '0 6px 25px rgba(0, 198, 255, 0.6)',
+      transform: 'translateY(-1px)'
     },
     '&.Mui-disabled': {
-      backgroundColor: '#ccc',
-      color: '#888'
+      background: 'rgba(255, 255, 255, 0.08)',
+      color: 'rgba(255, 255, 255, 0.3)',
+      boxShadow: 'none'
     }
   }
 }));

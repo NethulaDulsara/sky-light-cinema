@@ -85,6 +85,8 @@ class HomePage extends Component {
           title="Now Showing"
           to="/movie/category/nowShowing"
           movies={nowShowing}
+          autoplay={true}
+          autoplaySpeed={3000}
         />
         <MovieCarousel
           carouselClass={classes.carousel}

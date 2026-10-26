@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Typography, Select } from '@material-ui/core';
-import { Button, TextField, MenuItem } from '@material-ui/core';
+import { withStyles, Select, Button, TextField, MenuItem } from '@material-ui/core';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker
@@ -14,7 +13,8 @@ import { genreData, languageData } from '../../../../../data/MovieDataService';
 import {
   addMovie,
   updateMovie,
-  removeMovie
+  removeMovie,
+  setAlert
 } from '../../../../../store/actions';
 import FileUpload from '../../../../../components/FileUpload/FileUpload';
 
@@ -29,7 +29,8 @@ class AddMovie extends Component {
     director: '',
     cast: '',
     releaseDate: new Date(),
-    endDate: new Date()
+    endDate: new Date(),
+    loading: false
   };
 
   componentDidMount() {
@@ -48,7 +49,7 @@ class AddMovie extends Component {
       this.setState({
         title,
         language,
-        genre: genre.split(','),
+        genre: typeof genre === 'string' ? genre.split(',') : (genre || []),
         director,
         cast,
         description,
@@ -60,17 +61,15 @@ class AddMovie extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.movie !== this.props.movie) {
+    if (prevProps.movie !== this.props.movie && this.props.movie) {
       const { title, genre, language } = this.props.movie;
-      this.setState({ title, genre, language });
+      this.setState({
+        title,
+        genre: typeof genre === 'string' ? genre.split(',') : (genre || []),
+        language
+      });
     }
   }
-
-  handleChange = e => {
-    this.setState({
-      state: e.target.value
-    });
-  };
 
   handleFieldChange = (field, value) => {
     const newState = { ...this.state };
@@ -78,19 +77,130 @@ class AddMovie extends Component {
     this.setState(newState);
   };
 
-  onAddMovie = () => {
-    const { image, genre, ...rest } = this.state;
-    const movie = { ...rest, genre: genre.join(',') };
-    this.props.addMovie(image, movie);
+  validateForm = () => {
+    const {
+      title,
+      genre,
+      language,
+      duration,
+      description,
+      director,
+      cast
+    } = this.state;
+
+    if (!title || !title.trim()) {
+      this.props.setAlert('Please enter the movie title.', 'error', 5000);
+      return false;
+    }
+    if (!genre || (Array.isArray(genre) && genre.length === 0)) {
+      this.props.setAlert('Please select at least one genre.', 'error', 5000);
+      return false;
+    }
+    if (!description || !description.trim()) {
+      this.props.setAlert('Please provide a synopsis / description.', 'error', 5000);
+      return false;
+    }
+    if (!language) {
+      this.props.setAlert('Please select a language.', 'error', 5000);
+      return false;
+    }
+    if (!duration || isNaN(Number(duration)) || Number(duration) <= 0) {
+      this.props.setAlert('Please enter a valid movie duration in minutes.', 'error', 5000);
+      return false;
+    }
+    if (!director || !director.trim()) {
+      this.props.setAlert('Please enter the director name.', 'error', 5000);
+      return false;
+    }
+    if (!cast || !cast.trim()) {
+      this.props.setAlert('Please enter the cast members.', 'error', 5000);
+      return false;
+    }
+    return true;
   };
 
-  onUpdateMovie = () => {
-    const { image, genre, ...rest } = this.state;
-    const movie = { ...rest, genre: genre.join(',') };
-    this.props.updateMovie(this.props.edit._id, movie, image);
+  onAddMovie = async () => {
+    if (!this.validateForm()) return;
+
+    const {
+      title,
+      genre,
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      releaseDate,
+      endDate,
+      image
+    } = this.state;
+
+    this.setState({ loading: true });
+
+    const movie = {
+      title: title.trim(),
+      genre: Array.isArray(genre) ? genre.join(',') : genre,
+      language: language.trim(),
+      duration: Number(duration),
+      description: description.trim(),
+      director: director.trim(),
+      cast: cast.trim(),
+      releaseDate: releaseDate ? (releaseDate.toDate ? releaseDate.toDate() : (releaseDate._d || releaseDate)) : new Date(),
+      endDate: endDate ? (endDate.toDate ? endDate.toDate() : (endDate._d || endDate)) : new Date()
+    };
+
+    const success = await this.props.addMovie(image, movie);
+    this.setState({ loading: false });
+    if (success && this.props.handleClose) {
+      this.props.handleClose();
+    }
   };
 
-  onRemoveMovie = () => this.props.removeMovie(this.props.edit._id);
+  onUpdateMovie = async () => {
+    if (!this.validateForm()) return;
+
+    const {
+      title,
+      genre,
+      language,
+      duration,
+      description,
+      director,
+      cast,
+      releaseDate,
+      endDate,
+      image
+    } = this.state;
+
+    this.setState({ loading: true });
+
+    const movie = {
+      title: title.trim(),
+      genre: Array.isArray(genre) ? genre.join(',') : genre,
+      language: language.trim(),
+      duration: Number(duration),
+      description: description.trim(),
+      director: director.trim(),
+      cast: cast.trim(),
+      releaseDate: releaseDate ? (releaseDate.toDate ? releaseDate.toDate() : (releaseDate._d || releaseDate)) : new Date(),
+      endDate: endDate ? (endDate.toDate ? endDate.toDate() : (endDate._d || endDate)) : new Date()
+    };
+
+    const success = await this.props.updateMovie(this.props.edit._id, movie, image);
+    this.setState({ loading: false });
+    if (success && this.props.handleClose) {
+      this.props.handleClose();
+    }
+  };
+
+  onRemoveMovie = async () => {
+    this.setState({ loading: true });
+    const success = await this.props.removeMovie(this.props.edit._id);
+    this.setState({ loading: false });
+    if (success && this.props.handleClose) {
+      this.props.handleClose();
+    }
+  };
 
   render() {
     const { classes, className } = this.props;
@@ -104,28 +214,26 @@ class AddMovie extends Component {
       director,
       cast,
       releaseDate,
-      endDate
+      endDate,
+      loading
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
-    const subtitle = this.props.edit ? 'Edit Movie' : 'Add Movie';
-    const submitButton = this.props.edit ? 'Update Movie' : 'Save Details';
+    const submitButton = this.props.edit
+      ? (loading ? 'Updating Movie...' : 'Update Movie')
+      : (loading ? 'Saving Details...' : 'Save Details');
     const submitAction = this.props.edit
       ? () => this.onUpdateMovie()
       : () => this.onAddMovie();
 
     return (
       <div className={rootClassName}>
-        <Typography variant="h4" className={classes.title}>
-          {subtitle}
-        </Typography>
-        <form autoComplete="off" noValidate>
-          <div className={classes.field}>
+        <form autoComplete="off" noValidate className={classes.form}>
+          <div className={classes.row}>
             <TextField
-              className={classes.textField}
-              helperText="Please specify the title"
-              label="Title"
-              margin="dense"
+              className={classes.field}
+              label="Movie Title"
+              placeholder="e.g. Inception"
               required
               value={title}
               variant="outlined"
@@ -133,16 +241,16 @@ class AddMovie extends Component {
                 this.handleFieldChange('title', event.target.value)
               }
             />
-          </div>
-          <div className={classes.field}>
-            <Select
-              multiple
-              displayEmpty
-              className={classes.textField}
+            <TextField
+              select
+              className={classes.field}
               label="Genre"
-              margin="dense"
               required
-              value={genre}
+              SelectProps={{
+                multiple: true,
+                value: genre,
+                renderValue: selected => (Array.isArray(selected) ? selected.join(', ') : selected)
+              }}
               variant="outlined"
               onChange={event =>
                 this.handleFieldChange('genre', event.target.value)
@@ -152,29 +260,29 @@ class AddMovie extends Component {
                   {genreItem}
                 </MenuItem>
               ))}
-            </Select>
+            </TextField>
           </div>
-          <div className={classes.field}>
-            <TextField
-              fullWidth
-              multiline
-              className={classes.textField}
-              label="Description"
-              margin="dense"
-              required
-              variant="outlined"
-              value={description}
-              onChange={event =>
-                this.handleFieldChange('description', event.target.value)
-              }
-            />
-          </div>
-          <div className={classes.field}>
+
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            className={classes.field}
+            label="Synopsis / Description"
+            placeholder="Write a brief overview of the storyline..."
+            required
+            variant="outlined"
+            value={description}
+            onChange={event =>
+              this.handleFieldChange('description', event.target.value)
+            }
+          />
+
+          <div className={classes.row}>
             <TextField
               select
-              className={classes.textField}
+              className={classes.field}
               label="Language"
-              margin="dense"
               required
               value={language}
               variant="outlined"
@@ -189,9 +297,9 @@ class AddMovie extends Component {
             </TextField>
 
             <TextField
-              className={classes.textField}
-              label="Duration"
-              margin="dense"
+              className={classes.field}
+              label="Duration (Minutes)"
+              placeholder="e.g. 148"
               type="number"
               value={duration}
               variant="outlined"
@@ -200,11 +308,12 @@ class AddMovie extends Component {
               }
             />
           </div>
-          <div className={classes.field}>
+
+          <div className={classes.row}>
             <TextField
-              className={classes.textField}
+              className={classes.field}
               label="Director"
-              margin="dense"
+              placeholder="e.g. Christopher Nolan"
               required
               value={director}
               variant="outlined"
@@ -213,9 +322,9 @@ class AddMovie extends Component {
               }
             />
             <TextField
-              className={classes.textField}
+              className={classes.field}
               label="Cast"
-              margin="dense"
+              placeholder="e.g. Leonardo DiCaprio, Joseph Gordon-Levitt"
               required
               value={cast}
               variant="outlined"
@@ -224,65 +333,64 @@ class AddMovie extends Component {
               }
             />
           </div>
-          <div className={classes.field}>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
+
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <div className={classes.row}>
               <KeyboardDatePicker
-                className={classes.textField}
+                className={classes.field}
                 inputVariant="outlined"
-                margin="normal"
                 id="release-date"
                 label="Release Date"
+                format="MMMM Do YYYY"
                 value={releaseDate}
                 onChange={date =>
-                  this.handleFieldChange('releaseDate', date._d)
+                  this.handleFieldChange('releaseDate', date ? date._d : new Date())
                 }
-                KeyboardButtonProps={{
-                  'aria-label': 'change date'
-                }}
               />
-
               <KeyboardDatePicker
-                className={classes.textField}
+                className={classes.field}
                 inputVariant="outlined"
-                margin="normal"
                 id="end-date"
                 label="End Date"
+                format="MMMM Do YYYY"
                 value={endDate}
-                onChange={date => this.handleFieldChange('endDate', date._d)}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date'
-                }}
+                onChange={date =>
+                  this.handleFieldChange('endDate', date ? date._d : new Date())
+                }
               />
-            </MuiPickersUtilsProvider>
-          </div>
-          <div className={classes.field}>
-            <FileUpload
-              className={classes.upload}
-              file={image}
-              onUpload={event => {
-                const file = event.target.files[0];
-                this.handleFieldChange('image', file);
-              }}
-            />
+            </div>
+          </MuiPickersUtilsProvider>
+
+          <FileUpload
+            className={classes.upload}
+            file={image}
+            onUpload={event => {
+              const file = event.target.files[0];
+              this.handleFieldChange('image', file);
+            }}
+          />
+
+          <div className={classes.actions}>
+            <Button
+              className={classes.submitButton}
+              color="primary"
+              variant="contained"
+              disabled={loading}
+              onClick={submitAction}>
+              {submitButton}
+            </Button>
+            {this.props.edit && (
+              <Button
+                color="secondary"
+                className={classes.deleteButton}
+                variant="contained"
+                disabled={loading}
+                onClick={this.onRemoveMovie}>
+                {loading ? 'Deleting...' : 'Delete Movie'}
+              </Button>
+            )}
           </div>
         </form>
-
-        <Button
-          className={classes.buttonFooter}
-          color="primary"
-          variant="contained"
-          onClick={submitAction}>
-          {submitButton}
-        </Button>
-        {this.props.edit && (
-          <Button
-            color="secondary"
-            className={classes.buttonFooter}
-            variant="contained"
-            onClick={this.onRemoveMovie}>
-            Delete Movie
-          </Button>
-        )}
       </div>
     );
   }
@@ -291,14 +399,15 @@ class AddMovie extends Component {
 AddMovie.propTypes = {
   className: PropTypes.string,
   classes: PropTypes.object,
-  movie: PropTypes.object
+  movie: PropTypes.object,
+  handleClose: PropTypes.func
 };
 
 const mapStateToProps = ({ movieState }) => ({
   movies: movieState.movies
 });
 
-const mapDispatchToProps = { addMovie, updateMovie, removeMovie };
+const mapDispatchToProps = { addMovie, updateMovie, removeMovie, setAlert };
 
 export default connect(
   mapStateToProps,

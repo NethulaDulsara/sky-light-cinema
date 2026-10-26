@@ -63,7 +63,10 @@ class AddCinema extends Component {
       ? (notification = await updateCinemas(image, cinema, _id))
       : (notification = await removeCinemas(_id));
     this.setState({ notification });
-    if (notification && notification.status === 'success') getCinemas();
+    if (notification && notification.status === 'success') {
+      getCinemas();
+      if (this.props.handleClose) this.props.handleClose();
+    }
   };
 
   handleSeatsChange = (index, value) => {
@@ -132,7 +135,6 @@ class AddCinema extends Component {
     } = this.state;
 
     const rootClassName = classNames(classes.root, className);
-    const mainTitle = this.props.editCinema ? 'Edit Cinema' : 'Add Cinema';
     const submitButton = this.props.editCinema
       ? 'Update Cinema'
       : 'Save Details';
@@ -142,16 +144,12 @@ class AddCinema extends Component {
 
     return (
       <div className={rootClassName}>
-        <Typography variant="h4" className={classes.title}>
-          {mainTitle}
-        </Typography>
-        <form autoComplete="off" noValidate>
-          <div className={classes.field}>
+        <form autoComplete="off" noValidate className={classes.form}>
+          <div className={classes.row}>
             <TextField
-              className={classes.textField}
-              helperText="Please specify the cinema name"
-              label="Name"
-              margin="dense"
+              className={classes.field}
+              label="Cinema Name"
+              placeholder="e.g. Sky Light Prime"
               required
               value={name}
               variant="outlined"
@@ -161,10 +159,9 @@ class AddCinema extends Component {
             />
 
             <TextField
-              fullWidth
-              className={classes.textField}
+              className={classes.field}
               label="City"
-              margin="dense"
+              placeholder="e.g. Colombo / Malabe"
               required
               variant="outlined"
               value={city}
@@ -173,22 +170,21 @@ class AddCinema extends Component {
               }
             />
           </div>
-          <div className={classes.field}>
-            <FileUpload
-              className={classes.textField}
-              file={image}
-              onUpload={event => {
-                const file = event.target.files[0];
-                this.handleFieldChange('image', file);
-              }}
-            />
-          </div>
 
-          <div className={classes.field}>
+          <FileUpload
+            className={classes.field}
+            file={image}
+            onUpload={event => {
+              const file = event.target.files[0];
+              this.handleFieldChange('image', file);
+            }}
+          />
+
+          <div className={classes.row}>
             <TextField
-              className={classes.textField}
-              label="Ticket Price"
-              margin="dense"
+              className={classes.field}
+              label="Ticket Price (LKR)"
+              placeholder="e.g. 800"
               type="number"
               required
               value={ticketPrice}
@@ -198,9 +194,10 @@ class AddCinema extends Component {
               }
             />
             <TextField
-              className={classes.textField}
+              className={classes.field}
               label="Seats Available"
-              margin="dense"
+              placeholder="e.g. 120"
+              type="number"
               required
               value={seatsAvailable}
               variant="outlined"
@@ -209,25 +206,28 @@ class AddCinema extends Component {
               }
             />
           </div>
-          {this.renderSeatFields()}
-        </form>
 
-        <Button
-          className={classes.buttonFooter}
-          color="primary"
-          variant="contained"
-          onClick={submitAction}>
-          {submitButton}
-        </Button>
-        {this.props.editCinema && (
-          <Button
-            color="secondary"
-            className={classes.buttonFooter}
-            variant="contained"
-            onClick={() => this.onSubmitAction('remove')}>
-            Delete Cinema
-          </Button>
-        )}
+          {this.renderSeatFields()}
+
+          <div className={classes.actions}>
+            <Button
+              className={classes.submitButton}
+              color="primary"
+              variant="contained"
+              onClick={submitAction}>
+              {submitButton}
+            </Button>
+            {this.props.editCinema && (
+              <Button
+                color="secondary"
+                className={classes.deleteButton}
+                variant="contained"
+                onClick={() => this.onSubmitAction('remove')}>
+                Delete Cinema
+              </Button>
+            )}
+          </div>
+        </form>
 
         {notification && notification.status ? (
           notification.status === 'success' ? (

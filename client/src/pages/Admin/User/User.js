@@ -77,6 +77,7 @@ class User extends Component {
         <div className={classes.content}>{this.renderUsers()}</div>
         <ResponsiveDialog
           id="Add-user"
+          title={selectedUsers.length === 1 ? 'Edit User Profile' : 'Add New User'}
           open={openDialog}
           handleClose={() => toggleUserDialog()}>
           <AddUser

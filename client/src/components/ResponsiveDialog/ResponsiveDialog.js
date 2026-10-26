@@ -1,12 +1,76 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Button,
+  Typography,
+  useMediaQuery
+} from '@material-ui/core';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import CloseIcon from '@material-ui/icons/Close';
+
+const useStyles = makeStyles(theme => ({
+  dialogPaper: {
+    background: 'linear-gradient(145deg, #131b2e 0%, #0c101c 100%) !important',
+    border: '1px solid rgba(255, 255, 255, 0.1) !important',
+    borderRadius: '20px !important',
+    boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 198, 255, 0.08) !important',
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  dialogTitle: {
+    padding: theme.spacing(3, 4, 2),
+    borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  titleText: {
+    fontWeight: 800,
+    fontSize: '20px',
+    letterSpacing: '0.5px',
+    background: 'linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  },
+  closeButton: {
+    color: '#94a3b8',
+    padding: '8px',
+    borderRadius: '10px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.06)',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      color: '#ffffff',
+      background: 'rgba(239, 68, 68, 0.15)',
+      borderColor: 'rgba(239, 68, 68, 0.3)'
+    }
+  },
+  dialogContent: {
+    padding: `${theme.spacing(3, 4)} !important`
+  },
+  dialogActions: {
+    padding: theme.spacing(2, 4),
+    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+    justifyContent: 'flex-end'
+  },
+  closeBtnAction: {
+    color: '#94a3b8',
+    borderRadius: '10px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    padding: '6px 20px',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      color: '#ffffff',
+      background: 'rgba(255, 255, 255, 0.05)',
+      borderColor: 'rgba(255, 255, 255, 0.2)'
+    }
+  }
+}));
 
 const ResponsiveDialog = ({
   id,
@@ -15,9 +79,10 @@ const ResponsiveDialog = ({
   children,
   open,
   handleClose,
-  maxWidth = 'lg'
+  maxWidth = 'md'
 }) => {
   const theme = useTheme();
+  const classes = useStyles();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
@@ -27,15 +92,33 @@ const ResponsiveDialog = ({
       maxWidth={maxWidth}
       open={open}
       onClose={handleClose}
+      classes={{ paper: classes.dialogPaper }}
       aria-labelledby={id}>
-      <DialogTitle id={id}>{title}</DialogTitle>
-      <DialogContent>
-        <DialogContentText>{contentText}</DialogContentText>
+      <div className={classes.dialogTitle}>
+        <Typography variant="h5" className={classes.titleText}>
+          {title}
+        </Typography>
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={handleClose}
+          size="small">
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </div>
+
+      <DialogContent className={classes.dialogContent}>
+        {contentText && (
+          <DialogContentText style={{ color: '#94a3b8', marginBottom: '16px' }}>
+            {contentText}
+          </DialogContentText>
+        )}
         {children}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary" autoFocus>
-          Done
+
+      <DialogActions className={classes.dialogActions}>
+        <Button onClick={handleClose} className={classes.closeBtnAction}>
+          Close
         </Button>
       </DialogActions>
     </Dialog>

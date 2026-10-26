@@ -12,74 +12,90 @@ import {
 
 const useStyles = makeStyles(theme => ({
   dialogPaper: {
-    backgroundColor: '#fff',
-    color: '#000',
-    borderRadius: '16px',
-    padding: theme.spacing(3),
-    maxWidth: '800px',
+    backgroundColor: '#0f1422 !important',
+    background: 'linear-gradient(145deg, #161d31 0%, #0c101c 100%) !important',
+    color: '#f8fafc',
+    borderRadius: '20px',
+    border: '1px solid rgba(0, 198, 255, 0.25)',
+    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 198, 255, 0.12)',
+    padding: theme.spacing(4),
+    maxWidth: '750px',
     width: '100%',
     fontFamily: '"Montserrat", sans-serif'
   },
   headerTitle: {
-    fontSize: '20px',
-    fontWeight: 400,
-    letterSpacing: '0.5px',
+    fontSize: '22px',
+    fontWeight: 700,
+    letterSpacing: '1px',
     textAlign: 'center',
     marginTop: theme.spacing(1),
-    color: '#000',
+    color: '#ffffff',
     textTransform: 'uppercase'
   },
   subtitle: {
     fontSize: '14px',
     textAlign: 'center',
-    color: '#000',
+    color: '#00C6FF',
     marginBottom: theme.spacing(3),
-    marginTop: theme.spacing(2),
-    fontWeight: 600
+    marginTop: theme.spacing(1),
+    fontWeight: 600,
+    letterSpacing: '0.5px'
   },
   list: {
-    paddingLeft: theme.spacing(2)
+    paddingLeft: theme.spacing(2),
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    borderRadius: '12px',
+    padding: theme.spacing(2, 3),
+    border: '1px solid rgba(255, 255, 255, 0.06)'
   },
   listItem: {
     display: 'list-item',
     listStyleType: 'disc',
     fontSize: '13px',
-    color: '#000',
-    marginBottom: theme.spacing(2),
+    color: '#cbd5e1',
+    marginBottom: theme.spacing(1.5),
     paddingLeft: 0,
     paddingTop: 0,
     paddingBottom: 0,
-    lineHeight: 1.5
+    lineHeight: 1.6
   },
   linkText: {
     fontSize: '12px',
-    color: '#000',
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(3)
+    color: '#94a3b8',
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(2),
+    textAlign: 'center'
   },
   linkHref: {
-    color: '#d32f2f',
+    color: '#00C6FF',
     textDecoration: 'none',
+    fontWeight: 600,
     '&:hover': {
-      textDecoration: 'underline'
+      textDecoration: 'underline',
+      color: '#38bdf8'
     }
   },
   agreeButtonWrapper: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(3),
     marginBottom: theme.spacing(1)
   },
   agreeButton: {
-    backgroundColor: '#39338b',
-    color: '#fff',
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072ff 100%)',
+    color: '#ffffff',
     padding: '12px 64px',
-    fontWeight: 600,
+    fontWeight: 700,
     fontSize: '14px',
-    borderRadius: '4px',
+    letterSpacing: '1px',
+    borderRadius: '10px',
     textTransform: 'uppercase',
+    boxShadow: '0 4px 20px rgba(0, 198, 255, 0.4)',
+    transition: 'all 0.2s ease',
     '&:hover': {
-      backgroundColor: '#2a2569'
+      background: 'linear-gradient(135deg, #00b4e6 0%, #0060d6 100%)',
+      boxShadow: '0 6px 25px rgba(0, 198, 255, 0.6)',
+      transform: 'translateY(-1px)'
     }
   }
 }));

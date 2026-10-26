@@ -41,23 +41,28 @@ const useStyles = makeStyles(() => ({
 }));
 
 const BestMovies = props => {
-  const { className, bestMovies } = props;
+  const { className, bestMovies = [] } = props;
   const classes = useStyles();
 
+  const validMovies = (bestMovies || []).filter(movie => movie && movie.movie && movie.movie.title);
+
   const data = {
-    labels: bestMovies.map(movie => movie.movie.title.toUpperCase()),
+    labels:
+      validMovies.length > 0
+        ? validMovies.map(movie => movie.movie.title.toUpperCase())
+        : ['NO RESERVATIONS'],
     datasets: [
       {
         label: 'This year',
         backgroundColor: 'rgba(0, 198, 255, 0.7)',
         hoverBackgroundColor: 'rgba(0, 198, 255, 1)',
-        data: bestMovies.map(movie => movie.count)
+        data: validMovies.length > 0 ? validMovies.map(movie => movie.count) : [0]
       },
       {
         label: 'Last year',
         backgroundColor: 'rgba(255, 107, 107, 0.5)',
         hoverBackgroundColor: 'rgba(255, 107, 107, 0.9)',
-        data: [11, 20, 12, 29, 30]
+        data: validMovies.length > 0 ? [11, 20, 12, 29, 30] : [0]
       }
     ]
   };

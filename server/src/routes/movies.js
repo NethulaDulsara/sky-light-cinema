@@ -42,7 +42,7 @@ router.post(
       res.send({ movie, file });
     } catch (e) {
       console.log(e);
-      res.sendStatus(400).send(e);
+      res.status(400).send(e);
     }
   }
 );

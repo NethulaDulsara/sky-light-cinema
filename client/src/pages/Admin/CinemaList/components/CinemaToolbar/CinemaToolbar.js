@@ -1,8 +1,8 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withStyles } from '@material-ui/core';
-import { Button } from '@material-ui/core';
+import { withStyles, Button } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 import { SearchInput, ResponsiveDialog } from '../../../../../components';
 import styles from './styles';
 import AddCinema from '../AddCinema/AddCinema';
@@ -23,7 +23,6 @@ class CinemaToolbar extends Component {
   render() {
     const { openAddDialog } = this.state;
     const { classes, className, search, onChangeSearch } = this.props;
-
     const rootClassName = classNames(classes.root, className);
 
     return (
@@ -32,24 +31,26 @@ class CinemaToolbar extends Component {
           <div className={classes.row}>
             <SearchInput
               className={classes.searchInput}
-              placeholder="Search cinema"
+              placeholder="Search cinemas by name or city..."
               value={search}
               onChange={onChangeSearch}
             />
             <Button
               onClick={() => this.OpenAddDialog()}
               color="primary"
-              size="small"
-              variant="outlined">
-              Add
+              variant="contained"
+              className={classes.addButton}
+              startIcon={<AddIcon />}>
+              Add Cinema
             </Button>
           </div>
         </div>
         <ResponsiveDialog
           id="Add-cinema"
+          title="Add New Cinema"
           open={openAddDialog}
           handleClose={() => this.CloseAddDialog()}>
-          <AddCinema />
+          <AddCinema handleClose={() => this.CloseAddDialog()} />
         </ResponsiveDialog>
       </Fragment>
     );

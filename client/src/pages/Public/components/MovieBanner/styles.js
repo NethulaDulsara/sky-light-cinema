@@ -93,7 +93,18 @@ export default theme => ({
     width: 200,
     height: 70,
     borderRadius: 0,
-    zIndex: 2
+    zIndex: 2,
+    backgroundColor: 'rgba(13, 20, 36, 0.85)',
+    borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+    borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+    fontSize: '15px',
+    fontWeight: 600,
+    letterSpacing: '0.5px',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.95)',
+      color: '#00C6FF'
+    }
   },
   learnMore: { color: theme.palette.common.white },
   buttonIcon: { marginLeft: theme.spacing(2) },

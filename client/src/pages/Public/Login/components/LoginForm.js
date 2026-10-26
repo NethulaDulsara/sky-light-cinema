@@ -70,9 +70,10 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function LoginForm(props) {
-  const { facebookLogin, googleLogin, isAuthenticated, user, redirect } = props;
+  const { facebookLogin, googleLogin, isAuthenticated, user, redirect, loading } = props;
   const classes = useStyles();
   const [values, setValues] = useState({ username: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && redirect) {
@@ -88,54 +89,72 @@ function LoginForm(props) {
       [e.target.name]: e.target.value
     });
 
+  const handleSubmit = e => {
+    if (e) e.preventDefault();
+    if (!values.username || !values.password) return;
+    setSubmitting(true);
+    props.login(values.username, values.password);
+  };
+
+  const hasGoogle = process.env.REACT_APP_GOOGLE_CLIENT_ID && process.env.REACT_APP_GOOGLE_CLIENT_ID !== '...';
+  const hasFacebook = process.env.REACT_APP_FACEBOOK_APP_ID && process.env.REACT_APP_FACEBOOK_APP_ID !== '...';
+
   return (
-    <form className={classes.form}>
+    <form className={classes.form} onSubmit={handleSubmit}>
       <Typography className={classes.title} variant="h2">
         Sign in
       </Typography>
 
-      <div className={classes.socialLogin}>
-        <GoogleLogin
-          clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-          onSuccess={googleLogin}
-          onFailure={googleLogin}
-          cookiePolicy={'single_host_origin'}
-          render={renderProps => (
-            <Button
-              onClick={renderProps.onClick}
-              disabled={renderProps.disabled}
-              fullWidth
-              variant="contained"
-              style={{
-                borderRadius: 0,
-                background: '#fff',
-                color: '#de5246',
-                marginBottom: 10,
-                height: 60,
-                fontSize: 'calc(.27548vw + 12.71074px)',
-                fontWeight: 700
-              }}>
-              Login With Google
-            </Button>
+      {(hasGoogle || hasFacebook) && (
+        <div className={classes.socialLogin}>
+          {hasGoogle && (
+            <GoogleLogin
+              clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+              onSuccess={googleLogin}
+              onFailure={googleLogin}
+              cookiePolicy={'single_host_origin'}
+              render={renderProps => (
+                <Button
+                  onClick={renderProps.onClick}
+                  disabled={renderProps.disabled}
+                  fullWidth
+                  variant="contained"
+                  style={{
+                    borderRadius: 8,
+                    background: '#fff',
+                    color: '#de5246',
+                    marginBottom: 10,
+                    height: 50,
+                    fontSize: '14px',
+                    fontWeight: 700
+                  }}>
+                  Login With Google
+                </Button>
+              )}
+            />
           )}
-        />
-        <FacebookLogin
-          buttonStyle={{ width: '100%', height: 60 }}
-          appId={process.env.REACT_APP_FACEBOOK_APP_ID} //APP ID NOT CREATED YET
-          fields="name,email,picture"
-          callback={facebookLogin}
-        />
-      </div>
+          {hasFacebook && (
+            <FacebookLogin
+              buttonStyle={{ width: '100%', height: 50, borderRadius: 8 }}
+              appId={process.env.REACT_APP_FACEBOOK_APP_ID}
+              fields="name,email,picture"
+              callback={facebookLogin}
+            />
+          )}
+        </div>
+      )}
 
       <div className={classes.fields}>
         <TextField
           className={classes.textField}
-          label="username"
+          label="Username"
           name="username"
           onChange={event => handleFieldChange(event)}
           type="text"
           value={values.username}
           variant="outlined"
+          autoComplete="username"
+          required
         />
         <TextField
           className={classes.textField}
@@ -145,19 +164,22 @@ function LoginForm(props) {
           type="password"
           value={values.password}
           variant="outlined"
+          autoComplete="current-password"
+          required
         />
       </div>
 
       <Button
         className={classes.loginButton}
         color="primary"
-        onClick={() => props.login(values.username, values.password)}
+        type="submit"
         size="large"
-        variant="contained">
-        Login now
+        variant="contained"
+        disabled={submitting && loading}>
+        {submitting && loading ? 'Signing in...' : 'Login now'}
       </Button>
       <Typography className={classes.register} variant="body1">
-        Don't have an account?
+        Don't have an account?{' '}
         <Link className={classes.registerUrl} to="/register">
           register
         </Link>
@@ -168,7 +190,8 @@ function LoginForm(props) {
 
 const mapStateToProps = state => ({
   isAuthenticated: state.authState.isAuthenticated,
-  user: state.authState.user
+  user: state.authState.user,
+  loading: state.authState.loading
 });
 export default connect(mapStateToProps, { login, facebookLogin, googleLogin })(
   LoginForm

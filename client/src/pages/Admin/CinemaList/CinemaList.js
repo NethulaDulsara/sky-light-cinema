@@ -68,6 +68,7 @@ class CinemaList extends Component {
         </div>
         <ResponsiveDialog
           id="Edit-cinema"
+          title="Edit Cinema Details"
           open={this.state.openEditDialog}
           handleClose={() => this.CloseEditDialog()}>
           <AddCinema

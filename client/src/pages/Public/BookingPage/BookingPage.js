@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, Grid, Container } from '@material-ui/core';
+import { withStyles, Grid, Container, Typography, Button } from '@material-ui/core';
 import {
   getMovie,
   getCinemasUserModeling,
@@ -110,14 +110,15 @@ class BookingPage extends Component {
     const seats = this.onGetReservedSeats();
     
     // If the seat is already occupied or doesn't exist, do nothing
-    if (!seats[row] || seats[row][seat] === 1) return;
+    if (!seats || !seats[row] || seats[row][seat] === 1) return;
+
+    const currentSelected = selectedSeats || [];
 
     // Check if the seat is currently selected
-    // Note: Redux action toggles the seat if it's already in selectedSeats
-    const isSelected = selectedSeats.some(s => s[0] === row && s[1] === seat);
+    const isSelected = currentSelected.some(s => s[0] === row && s[1] === seat);
 
-    // If it's not selected and we've reached the ticket limit, show an alert or just return
-    if (!isSelected && selectedSeats.length >= ticketCount) {
+    // If it's not selected and we've reached the ticket limit, do nothing
+    if (!isSelected && currentSelected.length >= ticketCount) {
       return; 
     }
 
@@ -156,21 +157,21 @@ class BookingPage extends Component {
     const {
       movie,
       cinema,
+      cinemas,
+      selectedCinema,
       selectedSeats,
       selectedDate,
       selectedTime,
       getReservations,
-      isAuth,
-      user,
       addReservation,
-      toggleLoginPopup,
-      showInvitationForm,
       setQRCode
     } = this.props;
 
-    if (selectedSeats.length === 0) return;
+    const currentCinema = cinema || (cinemas && cinemas.find(c => c._id === selectedCinema));
 
-    const adultPrice = cinema.ticketPrice;
+    if (!selectedSeats || selectedSeats.length === 0) return;
+
+    const adultPrice = currentCinema ? (currentCinema.ticketPrice || 1500) : 1500;
     const childPrice = adultPrice - 100;
     const totalPrice = (adultCount * adultPrice) + (childCount * childPrice);
 
@@ -180,15 +181,15 @@ class BookingPage extends Component {
       date: selectedDate,
       startAt: selectedTime,
       seats: this.bookSeats(),
-      ticketPrice: cinema.ticketPrice, // Note: backend might still expect a single price for schema, but we pass total correctly
+      ticketPrice: adultPrice,
       total: totalPrice,
-      movieId: movie._id,
-      cinemaId: cinema._id,
+      movieId: movie ? movie._id : '',
+      cinemaId: currentCinema ? currentCinema._id : selectedCinema,
       username: 'Guest',
       email: 'guest@example.com',
       phone: '0000000000'
     });
-    if (response.status === 'success') {
+    if (response && response.status === 'success') {
       const { data } = response;
       setQRCode(data.QRCode);
       getReservations();
@@ -196,8 +197,8 @@ class BookingPage extends Component {
       this.props.history.push({
         pathname: '/payment/' + data.reservation._id,
         state: {
-          movieTitle: movie.title,
-          cinemaName: cinema.name,
+          movieTitle: movie ? movie.title : '',
+          cinemaName: currentCinema ? currentCinema.name : '',
           date: selectedDate,
           time: selectedTime,
           seats: this.bookSeats(),
@@ -247,28 +248,44 @@ class BookingPage extends Component {
   }
 
   onGetReservedSeats = () => {
-    const { reservations, cinema, selectedDate, selectedTime } = this.props;
+    const { reservations, cinema, cinemas, selectedCinema, selectedDate, selectedTime } = this.props;
+    const currentCinema = cinema || (cinemas && cinemas.find(c => c._id === selectedCinema));
 
-    if (!cinema) return [];
-    let newSeats = cinema.seats.map(row => [...row]);
+    let newSeats = currentCinema && currentCinema.seats && currentCinema.seats.length
+      ? currentCinema.seats.map(row => [...row])
+      : [];
 
-    // If cinema has no seats, generate a default 10x10 seat map (100 seats)
+    // If cinema has no seats or is not loaded yet, generate a default 10x10 seat map (100 seats)
     if (newSeats.length === 0) {
       newSeats = Array.from({ length: 10 }, () => Array(10).fill(0));
     }
 
+    if (!selectedDate || !selectedTime || !reservations || !reservations.length) {
+      return newSeats;
+    }
+
     const filteredReservations = reservations.filter(
       reservation =>
+        reservation &&
+        reservation.date &&
         new Date(reservation.date).toLocaleDateString() ===
           new Date(selectedDate).toLocaleDateString() &&
         reservation.startAt === selectedTime
     );
-    if (filteredReservations.length && selectedDate && selectedTime) {
+
+    if (filteredReservations.length) {
       const reservedSeats = filteredReservations
-        .map(reservation => reservation.seats)
-        .reduce((a, b) => a.concat(b));
-      reservedSeats.forEach(([row, seat]) => (newSeats[row][seat] = 1));
-      return newSeats;
+        .map(reservation => (Array.isArray(reservation.seats) ? reservation.seats : []))
+        .reduce((a, b) => a.concat(b), []);
+
+      reservedSeats.forEach(coord => {
+        if (Array.isArray(coord) && coord.length >= 2) {
+          const [row, seat] = coord;
+          if (newSeats[row] && newSeats[row][seat] !== undefined) {
+            newSeats[row][seat] = 1;
+          }
+        }
+      });
     }
     return newSeats;
   };
@@ -402,8 +419,15 @@ class BookingPage extends Component {
   };
 
   setSuggestionSeats = (seats, suggestedSeats) => {
+    if (!seats || !seats.length || !suggestedSeats || !Array.isArray(suggestedSeats)) return seats;
     suggestedSeats.forEach(suggestedSeat => {
-      seats[suggestedSeat[0]][suggestedSeat[1]] = 3;
+      if (
+        Array.isArray(suggestedSeat) &&
+        seats[suggestedSeat[0]] &&
+        seats[suggestedSeat[0]][suggestedSeat[1]] !== undefined
+      ) {
+        seats[suggestedSeat[0]][suggestedSeat[1]] = 3;
+      }
     });
     return seats;
   };
@@ -414,6 +438,7 @@ class BookingPage extends Component {
       user,
       movie,
       cinema,
+      cinemas,
       showtimes,
       selectedSeats,
       selectedCinema,
@@ -428,22 +453,25 @@ class BookingPage extends Component {
       suggestedSeats,
       suggestedSeat
     } = this.props;
+
+    const currentCinema = cinema || (cinemas && cinemas.find(c => c._id === selectedCinema));
+
     const { uniqueCinemas, uniqueTimes } = this.onFilterCinema();
     let seats = this.onGetReservedSeats();
-    if (suggestedSeats && selectedTime && !suggestedSeat.length) {
-      this.onGetSuggestedSeats(seats, suggestedSeats);
-    }
-    if (suggestedSeat.length && !this.didSetSuggestion) {
+
+    if (suggestedSeat && suggestedSeat.length && !this.didSetSuggestion) {
       seats = this.setSuggestionSeats(seats, suggestedSeat);
       this.didSetSuggestion = true;
     }
 
     // Apply selectedSeats to the seats array
-    if (selectedSeats && selectedSeats.length) {
+    if (selectedSeats && selectedSeats.length && seats && seats.length) {
       selectedSeats.forEach(seatCoord => {
-        const [row, seat] = seatCoord;
-        if (seats[row] && seats[row][seat] !== undefined) {
-          seats[row][seat] = 2; // 2 = Selected
+        if (Array.isArray(seatCoord) && seatCoord.length >= 2) {
+          const [row, seat] = seatCoord;
+          if (seats[row] && seats[row][seat] !== undefined) {
+            seats[row][seat] = 2; // 2 = Selected
+          }
         }
       });
     }
@@ -452,16 +480,16 @@ class BookingPage extends Component {
 
     return (
       <div className={classes.root}>
-        {cinema && (
+        {currentCinema && (
           <TicketTypeModal
             open={isTicketTypeModalOpen}
             onClose={this.onCloseTicketTypeModal}
-            totalTickets={selectedSeats.length}
-            adultPrice={cinema.ticketPrice}
+            totalTickets={selectedSeats ? selectedSeats.length : 0}
+            adultPrice={currentCinema.ticketPrice || 1500}
             onProceed={this.onProceedTicketTypeModal}
           />
         )}
-        {cinema && (
+        {currentCinema && (
           <TermsAndConditionsModal
             open={isTermsModalOpen}
             onClose={this.onCloseTermsModal}
@@ -477,11 +505,11 @@ class BookingPage extends Component {
         </ResponsiveDialog>
         {isSeatSelectionVisible ? (
           <>
-            {cinema && selectedCinema && selectedTime && !showInvitation && (
+            {currentCinema && (
               <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1200, backgroundColor: '#0a0a20', color: '#fff', overflowY: 'auto', paddingBottom: '100px' }}>
                 <BookingSeats
                   seats={seats}
-                  cinema={cinema}
+                  cinema={currentCinema}
                   selectedTime={selectedTime}
                   ticketCount={ticketCount}
                   onHideSeatSelection={this.onHideSeatSelection}
@@ -491,16 +519,22 @@ class BookingPage extends Component {
                 />
                 <BookingCheckout
                   user={user}
-                  ticketPrice={cinema.ticketPrice}
-                  seatsAvailable={cinema.seatsAvailable}
-                  selectedSeats={selectedSeats.length}
+                  ticketPrice={currentCinema.ticketPrice || 1500}
+                  seatsAvailable={currentCinema.seatsAvailable || 100}
+                  selectedSeats={selectedSeats ? selectedSeats.length : 0}
                   ticketCount={ticketCount}
                   onHideSeatSelection={this.onHideSeatSelection}
                   onBookSeats={this.onOpenTicketTypeModal}
                 />
               </div>
             )}
-            {showInvitation && !!selectedSeats.length && (
+            {!currentCinema && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', color: '#fff' }}>
+                <Typography variant="h5" style={{ color: '#00C6FF', marginBottom: '20px' }}>Loading seat map...</Typography>
+                <Button variant="outlined" style={{ color: '#fff', borderColor: '#00C6FF' }} onClick={this.onHideSeatSelection}>Back to Movie</Button>
+              </div>
+            )}
+            {showInvitation && !!(selectedSeats && selectedSeats.length) && (
               <BookingInvitation
                 selectedSeats={selectedSeats}
                 sendInvitations={this.sendInvitations}

@@ -1,19 +1,9 @@
 import React, { Component, Fragment } from 'react';
-
-// Externals
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
-// Material helpers
-import { withStyles } from '@material-ui/core';
-
-// Material components
-import { Button } from '@material-ui/core';
-
-// Shared components
+import { withStyles, Button } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
 import { SearchInput, ResponsiveDialog } from '../../../../../components';
-
-// Component styles
 import styles from './styles';
 import AddMovie from '../AddMovie/AddMovie';
 
@@ -33,7 +23,6 @@ class MovieToolbar extends Component {
   render() {
     const { openAddDialog } = this.state;
     const { classes, className, search, onChangeSearch } = this.props;
-
     const rootClassName = classNames(classes.root, className);
 
     return (
@@ -42,24 +31,26 @@ class MovieToolbar extends Component {
           <div className={classes.row}>
             <SearchInput
               className={classes.searchInput}
-              placeholder="Search movie"
+              placeholder="Search movies by title..."
               value={search}
               onChange={onChangeSearch}
             />
             <Button
               onClick={() => this.OpenAddDialog()}
               color="primary"
-              size="small"
-              variant="outlined">
-              Add
+              variant="contained"
+              className={classes.addButton}
+              startIcon={<AddIcon />}>
+              Add Movie
             </Button>
           </div>
         </div>
         <ResponsiveDialog
           id="Add-movie"
+          title="Add New Movie"
           open={openAddDialog}
           handleClose={() => this.CloseAddDialog()}>
-          <AddMovie />
+          <AddMovie handleClose={() => this.CloseAddDialog()} />
         </ResponsiveDialog>
       </Fragment>
     );

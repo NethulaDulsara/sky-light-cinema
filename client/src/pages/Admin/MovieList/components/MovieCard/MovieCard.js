@@ -3,84 +3,149 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { makeStyles } from '@material-ui/core';
 import { Typography } from '@material-ui/core';
-import { AccessTime as AccessTimeIcon } from '@material-ui/icons';
+import AccessTimeIcon from '@material-ui/icons/AccessTime';
+import TheatersIcon from '@material-ui/icons/TheatersOutlined';
 import { Paper } from '../../../../../components';
 
 const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: '100%',
-    paddingBottom: theme.spacing(2)
+    cursor: 'pointer',
+    position: 'relative',
+    borderRadius: '18px',
+    overflow: 'hidden',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    backgroundColor: 'rgba(17, 24, 39, 0.85)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    '&:hover': {
+      transform: 'translateY(-6px)',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 198, 255, 0.2)',
+      borderColor: 'rgba(0, 198, 255, 0.4)',
+      '& $image': {
+        transform: 'scale(1.05)'
+      }
+    }
   },
   imageWrapper: {
-    height: '200px',
-    margin: '0 auto',
+    height: '220px',
+    position: 'relative',
     overflow: 'hidden',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    background: '#0a0d14'
   },
   image: {
     width: '100%',
     height: '100%',
-    'object-fit': 'cover'
+    objectFit: 'cover',
+    transition: 'transform 0.4s ease'
   },
-  details: { padding: theme.spacing(3) },
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
+    background: 'linear-gradient(180deg, transparent 0%, rgba(17, 24, 39, 0.95) 100%)'
+  },
+  genreBadge: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    background: 'rgba(0, 0, 0, 0.75)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(0, 198, 255, 0.3)',
+    color: '#00C6FF',
+    padding: '4px 10px',
+    borderRadius: '20px',
+    fontSize: '11px',
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase'
+  },
+  details: {
+    padding: theme.spacing(2.5, 3, 1)
+  },
   title: {
     fontSize: '18px',
-    lineHeight: '21px',
-    marginTop: theme.spacing(2),
+    fontWeight: 700,
+    lineHeight: '24px',
+    color: '#ffffff',
     textTransform: 'capitalize'
   },
   description: {
-    lineHeight: '16px',
-    height: theme.spacing(4),
+    fontSize: '13px',
+    lineHeight: '18px',
+    height: '36px',
     overflow: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis',
-    color: theme.palette.text.secondary,
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(2)
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    color: '#94a3b8',
+    marginTop: theme.spacing(1)
   },
-  stats: {
+  footer: {
     display: 'flex',
     alignItems: 'center',
-    paddingTop: theme.spacing(1),
-    paddingLeft: theme.spacing(3)
+    justifyContent: 'space-between',
+    padding: theme.spacing(1.5, 3, 2),
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+    marginTop: theme.spacing(1.5)
   },
-  updateIcon: {
-    color: theme.palette.text.secondary
+  duration: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    color: '#64748b',
+    fontSize: '12px',
+    fontWeight: 500
   },
-  updateText: {
-    marginLeft: theme.spacing(1),
-    color: theme.palette.text.secondary
+  durationIcon: {
+    fontSize: '16px',
+    color: '#00C6FF'
+  },
+  editHint: {
+    color: '#00C6FF',
+    fontSize: '12px',
+    fontWeight: 600
   }
 }));
 
 function MovieCard(props) {
   const classes = useStyles(props);
   const { className, movie } = props;
-  const images ={eternals:'https://phantom-marca.unidadeditorial.es/927e619e34b67b9e7326c9266914e6f0/crop/68x0/1311x700/resize/1320/f/jpg/assets/multimedia/imagenes/2021/08/20/16294695683527.jpg','spider man-no way home':'https://images.indianexpress.com/2021/11/spider-man-no-way-home-new-poster-1200.jpg','avengers-infinity war':'https://pyxis.nymag.com/v1/imgs/8b3/ac6/ca28ec3072fdc00a5b59a72a75a39ab61b-20-avengers-lede.rsquare.w700.jpg','doctor strange-multiverse of madness':'https://m.media-amazon.com/images/I/818x-d2qUuL.jpg','wakanda forever':'https://thumbor.forbes.com/thumbor/fit-in/1200x0/filters%3Aformat%28jpg%29/https%3A%2F%2Fblogs-images.forbes.com%2Fscottmendelson%2Ffiles%2F2017%2F10%2FDMQuyI5V4AAUHP0.jpg'};
-
 
   const rootClassName = classNames(classes.root, className);
+  const genreFirst = movie.genre ? movie.genre.split(',')[0].trim() : 'Movie';
+
   return (
     <Paper className={rootClassName}>
       <div className={classes.imageWrapper}>
-        <img alt="movie" className={classes.image} src={movie.image || images[movie.title]} />
+        <img
+          alt={movie.title}
+          className={classes.image}
+          src={movie.image || 'https://via.placeholder.com/300x450?text=No+Poster'}
+        />
+        <div className={classes.imageOverlay} />
+        <span className={classes.genreBadge}>{genreFirst}</span>
       </div>
+
       <div className={classes.details}>
-        <Typography className={classes.title} variant="h4">
+        <Typography className={classes.title} variant="h6">
           {movie.title}
         </Typography>
-        <Typography className={classes.description} variant="body1">
+        <Typography className={classes.description} variant="body2">
           {movie.description}
         </Typography>
       </div>
-      <div className={classes.stats}>
-        <AccessTimeIcon className={classes.updateIcon} />
-        <Typography className={classes.updateText} variant="body2">
-          {movie.duration} minutes
-        </Typography>
+
+      <div className={classes.footer}>
+        <div className={classes.duration}>
+          <AccessTimeIcon className={classes.durationIcon} />
+          <span>{movie.duration} mins</span>
+        </div>
+        <span className={classes.editHint}>Click to Edit →</span>
       </div>
     </Paper>
   );

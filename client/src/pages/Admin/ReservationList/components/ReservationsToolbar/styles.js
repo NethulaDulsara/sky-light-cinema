@@ -1,13 +1,20 @@
 export default theme => ({
-  root: {},
+  root: {
+    marginBottom: theme.spacing(3)
+  },
   row: {
-    height: '42px',
     display: 'flex',
     alignItems: 'center',
     marginTop: theme.spacing(1),
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    gap: theme.spacing(2),
+    [theme.breakpoints.down('xs')]: {
+      flexDirection: 'column',
+      alignItems: 'stretch'
+    }
   },
   searchInput: {
-    marginRight: theme.spacing(1)
+    flex: '1 1 320px',
+    maxWidth: '450px'
   }
 });

@@ -14,12 +14,13 @@ export const uploadMovieImage = (id, image) => async dispatch => {
       },
       body: data
     });
-    const responseData = await response.json();
+    const responseData = await response.json().catch(() => ({}));
     if (response.ok) {
-      dispatch(setAlert('Image Uploaded', 'success', 5000));
+      dispatch(setAlert('Poster uploaded successfully!', 'success', 5000));
+      dispatch(getMovies());
     }
     if (responseData.error) {
-      dispatch(setAlert(responseData.error.message, 'error', 5000));
+      dispatch(setAlert(responseData.error.message || 'Poster upload failed', 'error', 5000));
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
@@ -91,19 +92,37 @@ export const addMovie = (image, newMovie) => async dispatch => {
       },
       body: JSON.stringify(newMovie)
     });
-    const movie = await response.json();
+    const movie = await response.json().catch(() => ({}));
     if (response.ok) {
-      dispatch(setAlert('Movie have been saved!', 'success', 5000));
-      if (image) dispatch(uploadMovieImage(movie._id, image));
+      dispatch(setAlert('Movie saved successfully!', 'success', 5000));
+      if (image && movie._id) {
+        await dispatch(uploadMovieImage(movie._id, image));
+      }
       dispatch(getMovies());
+      return true;
+    } else {
+      let errorMsg = 'Failed to save movie';
+      if (movie) {
+        if (movie.error && typeof movie.error === 'string') {
+          errorMsg = movie.error;
+        } else if (movie.error && movie.error.message) {
+          errorMsg = movie.error.message;
+        } else if (movie.message) {
+          errorMsg = movie.message;
+        } else if (movie.errors) {
+          errorMsg = Object.values(movie.errors).map(err => err.message).join(', ');
+        }
+      }
+      dispatch(setAlert(errorMsg, 'error', 6000));
+      return false;
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+    return false;
   }
 };
 
 export const updateMovie = (movieId, movie, image) => async dispatch => {
-  console.log('in update movie',movieId, movie, image);
   try {
     const token = localStorage.getItem('jwtToken');
     const url = '/movies/' + movieId;
@@ -115,15 +134,34 @@ export const updateMovie = (movieId, movie, image) => async dispatch => {
       },
       body: JSON.stringify(movie)
     });
+    const data = await response.json().catch(() => ({}));
     if (response.ok) {
       dispatch(onSelectMovie(null));
-      dispatch(setAlert('Movie have been saved!', 'success', 5000));
-      console.log('about to call uploadimage')
-      if (image) dispatch(uploadMovieImage(movieId, image));
+      dispatch(setAlert('Movie updated successfully!', 'success', 5000));
+      if (image) {
+        await dispatch(uploadMovieImage(movieId, image));
+      }
       dispatch(getMovies());
+      return true;
+    } else {
+      let errorMsg = 'Failed to update movie';
+      if (data) {
+        if (data.error && typeof data.error === 'string') {
+          errorMsg = data.error;
+        } else if (data.error && data.error.message) {
+          errorMsg = data.error.message;
+        } else if (data.message) {
+          errorMsg = data.message;
+        } else if (data.errors) {
+          errorMsg = Object.values(data.errors).map(err => err.message).join(', ');
+        }
+      }
+      dispatch(setAlert(errorMsg, 'error', 6000));
+      return false;
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+    return false;
   }
 };
 
@@ -141,9 +179,15 @@ export const removeMovie = movieId => async dispatch => {
     if (response.ok) {
       dispatch(getMovies());
       dispatch(onSelectMovie(null));
-      dispatch(setAlert('Movie have been Deleted!', 'success', 5000));
+      dispatch(setAlert('Movie has been deleted!', 'success', 5000));
+      return true;
+    } else {
+      const data = await response.json().catch(() => ({}));
+      dispatch(setAlert(data.message || data.error || 'Failed to delete movie', 'error', 5000));
+      return false;
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
+    return false;
   }
 };

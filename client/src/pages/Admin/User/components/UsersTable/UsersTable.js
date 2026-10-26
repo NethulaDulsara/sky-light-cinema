@@ -10,7 +10,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  Typography,
   TablePagination
 } from '@material-ui/core';
 
@@ -75,6 +74,7 @@ class UsersTable extends Component {
                   Name
                 </TableCell>
                 <TableCell align="left">Username</TableCell>
+                <TableCell align="left">Role</TableCell>
                 <TableCell align="left">Email</TableCell>
                 <TableCell align="left">Registration date</TableCell>
               </TableRow>
@@ -92,28 +92,70 @@ class UsersTable extends Component {
                     key={user._id}
                     selected={selectedUsers.indexOf(user._id) !== -1}>
                     <TableCell className={classes.tableCell}>
-                      <div className={classes.tableCellInner}>
+                      <div className={classes.tableCellInner} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Checkbox
                           checked={selectedUsers.indexOf(user._id) !== -1}
                           color="primary"
                           onChange={() => onSelect(user._id)}
                           value="true"
                         />
-                        <Typography
-                          className={classes.nameText}
-                          variant="body1">
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          fontSize: '12px'
+                        }}>
+                          {(user.name || user.username || 'U').charAt(0).toUpperCase()}
+                        </div>
+                        <span style={{ fontWeight: 600, color: '#f8fafc' }}>
                           {user.name}
-                        </Typography>
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {user.username}
+                      <span style={{
+                        fontFamily: 'monospace',
+                        color: '#00C6FF',
+                        background: 'rgba(0, 198, 255, 0.08)',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 600
+                      }}>
+                        @{user.username}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {user.email}
+                      <span style={{
+                        display: 'inline-flex',
+                        padding: '3px 10px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        background: user.role === 'superadmin' ? 'rgba(121, 40, 202, 0.15)' : 'rgba(0, 198, 255, 0.15)',
+                        color: user.role === 'superadmin' ? '#c084fc' : '#38bdf8',
+                        border: user.role === 'superadmin' ? '1px solid rgba(121, 40, 202, 0.3)' : '1px solid rgba(0, 198, 255, 0.3)'
+                      }}>
+                        {user.role || 'Guest'}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {moment(user.createdAt).format('DD/MM/YYYY')}
+                      <span style={{ color: '#cbd5e1' }}>
+                        {user.email}
+                      </span>
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      <span style={{ color: '#94a3b8', fontSize: '12px' }}>
+                        {moment(user.createdAt).format('MMM DD, YYYY')}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

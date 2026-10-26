@@ -70,6 +70,7 @@ class ShowtimeList extends Component {
         </div>
         <ResponsiveDialog
           id="Add-showtime"
+          title={selectedShowtimes.length === 1 ? 'Edit Showtime' : 'Create New Showtime'}
           open={openDialog}
           handleClose={() => toggleDialog()}>
           <AddShowtime

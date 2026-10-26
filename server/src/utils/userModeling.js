@@ -6,48 +6,46 @@ const Cinema = require('../models/cinema');
 // Get all cinemas based on the user's past reservations
 // @return a sorted cinema list
 const cinemaUserModeling = async (cinemas, username) => {
-  const userReservations = await Reservation.find({ username: username });
+  try {
+    const userReservations = await Reservation.find({ username: username });
 
-  if (userReservations.length) {
-    let cinemaResult = {};
-    userReservations.map(userReservation => {
-      const id = userReservation.cinemaId;
-      cinemaResult.hasOwnProperty(id) ? ++cinemaResult[id] : (cinemaResult[id] = 1);
-    });
-    const sortedCinemaResult = [];
-    for (let cinema in cinemaResult) {
-      sortedCinemaResult.push([cinema, cinemaResult[cinema]]);
-    }
-
-    sortedCinemaResult.sort((a, b) => {
-      return b[1] - a[1];
-    });
-    console.log(sortedCinemaResult);
-
-    const newCinemas = JSON.parse(JSON.stringify(cinemas));
-    let i = 0;
-    let extractedObj;
-    for (let sortedCinema of sortedCinemaResult) {
-      newCinemas.forEach((cinema, index) => {
-        if (cinema._id == sortedCinema[0]) {
-          console.log('FOUND');
-          extractedObj = newCinemas.splice(index, 1);
+    if (userReservations.length && cinemas && cinemas.length) {
+      let cinemaResult = {};
+      userReservations.forEach(userReservation => {
+        const id = userReservation.cinemaId;
+        if (id) {
+          cinemaResult[id] = (cinemaResult[id] || 0) + 1;
         }
       });
-      newCinemas.splice(i, 0, extractedObj[0]);
-      i++;
+      const sortedCinemaResult = [];
+      for (let cinema in cinemaResult) {
+        sortedCinemaResult.push([cinema, cinemaResult[cinema]]);
+      }
+
+      sortedCinemaResult.sort((a, b) => b[1] - a[1]);
+
+      const newCinemas = JSON.parse(JSON.stringify(cinemas));
+      let i = 0;
+      for (let sortedCinema of sortedCinemaResult) {
+        const foundIndex = newCinemas.findIndex(c => c && c._id == sortedCinema[0]);
+        if (foundIndex !== -1) {
+          const [extractedObj] = newCinemas.splice(foundIndex, 1);
+          if (extractedObj) {
+            newCinemas.splice(i, 0, extractedObj);
+            i++;
+          }
+        }
+      }
+      return newCinemas;
     }
-
-    console.log(newCinemas);
-
-    return newCinemas;
-  } else {
+    return cinemas;
+  } catch (e) {
     return cinemas;
   }
 };
 
 const moviesUserModeling = async username => {
-  userPreference = {
+  const userPreference = {
     genre: {},
     director: {},
     cast: {},
@@ -58,17 +56,19 @@ const moviesUserModeling = async username => {
   );
   const Allmovies = JSON.parse(JSON.stringify(await Movie.find({})));
 
-  const moviesWatched = userReservations.map(reservation => {
-    for (let movie of Allmovies) {
-      if (movie._id == reservation.movieId) {
-        return movie;
+  const moviesWatched = userReservations
+    .map(reservation => {
+      for (let movie of Allmovies) {
+        if (movie._id == reservation.movieId) {
+          return movie;
+        }
       }
-    }
-  });
+      return null;
+    })
+    .filter(Boolean);
 
-  //  console.log(moviesWatched);
-
-  moviesWatched.map(movie => {
+  moviesWatched.forEach(movie => {
+    if (!movie.genre || !movie.director || !movie.cast) return;
     let genres = movie.genre.replace(/\s*,\s*/g, ',').split(',');
     let directors = movie.director.replace(/\s*,\s*/g, ',').split(',');
     let casts = movie.cast.replace(/\s*,\s*/g, ',').split(',');
@@ -130,9 +130,9 @@ const getRateOfProperty = (pref, userPreference, movie) => {
     return [key, userPreference[pref][key]];
   });
   let movieValues = movie[pref].replace(/\s*,\s*/g, ',').split(',');
-  for (value of values) {
+  for (const value of values) {
     if (movieValues.length) {
-      for (movieValue of movieValues) {
+      for (const movieValue of movieValues) {
         if (movieValue == value[0]) {
           rate += value[1];
         }
@@ -176,41 +176,59 @@ const moviesNotWatchedFilter = (availableMovies, userReservations) => {
 };
 
 const reservationSeatsUserModeling = async (username, newSeats) => {
-  let numberOfTicketsArray = [];
-  let numberOfTickets = 1;
-  const positions = {
-    front: 0,
-    center: 0,
-    back: 0,
-  };
-  const cinemas = JSON.parse(JSON.stringify(await Cinema.find({})));
-  const userReservations = JSON.parse(
-    JSON.stringify(await Reservation.find({ username: username }))
-  );
+  try {
+    let numberOfTicketsArray = [];
+    let numberOfTickets = 1;
+    const positions = {
+      front: 0,
+      center: 0,
+      back: 0,
+    };
+    const cinemas = JSON.parse(JSON.stringify(await Cinema.find({})));
+    const userReservations = JSON.parse(
+      JSON.stringify(await Reservation.find({ username: username }))
+    );
 
-  userReservations.map(reservation => {
-    for (let cinema of cinemas) {
-      if (cinema._id == reservation.cinemaId) {
-        //find how many rows the cinema has
-        const position = getPosition(cinema.seats.length, reservation.seats);
-        ++positions[position];
-        numberOfTicketsArray.push(reservation.seats.length);
+    userReservations.forEach(reservation => {
+      for (let cinema of cinemas) {
+        if (
+          cinema._id == reservation.cinemaId &&
+          Array.isArray(reservation.seats) &&
+          reservation.seats.length
+        ) {
+          const rowsCount = cinema.seats && cinema.seats.length ? cinema.seats.length : 10;
+          const position = getPosition(rowsCount, reservation.seats);
+          if (positions[position] !== undefined) {
+            ++positions[position];
+          }
+          numberOfTicketsArray.push(reservation.seats.length);
+        }
       }
-    }
-  });
-  numberOfTickets = Math.round(
-    numberOfTicketsArray.reduce((a, b) => a + b, 0) / numberOfTicketsArray.length
-  );
+    });
 
-  return {
-    numberOfTickets,
-    positions,
-  };
+    if (numberOfTicketsArray.length) {
+      numberOfTickets = Math.round(
+        numberOfTicketsArray.reduce((a, b) => a + b, 0) / numberOfTicketsArray.length
+      );
+    }
+
+    return {
+      numberOfTickets,
+      positions,
+    };
+  } catch (err) {
+    return {
+      numberOfTickets: 1,
+      positions: { front: 0, center: 1, back: 0 }
+    };
+  }
 };
 
 const getPosition = (cinemaRows, seats) => {
-  const rowNum = seats[0][0];
+  if (!cinemaRows || cinemaRows <= 0 || !seats || !seats.length || !seats[0]) return 'center';
+  const rowNum = Number(seats[0][0]) || 0;
   const step = cinemaRows / 3;
+  if (!step || step <= 0) return 'center';
   let pos = 1;
   for (let i = step; i <= cinemaRows; i += step) {
     if (rowNum < i) {
@@ -225,6 +243,7 @@ const getPosition = (cinemaRows, seats) => {
     }
     pos++;
   }
+  return 'center';
 };
 
 const userModeling = {

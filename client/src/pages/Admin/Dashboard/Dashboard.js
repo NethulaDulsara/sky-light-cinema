@@ -50,6 +50,9 @@ class Dashboard extends Component {
   }
 
   getBestMovies = (reservations, movies, total = 5) => {
+    if (!reservations || !reservations.length || !movies || !movies.length) {
+      return [];
+    }
     const reservationCounter = reservations.map(reservation => ({
       movieId: reservation.movieId,
       count: reservations.filter(r => r.movieId === reservation.movieId).length
@@ -58,7 +61,7 @@ class Dashboard extends Component {
     const result = [];
     const map = new Map();
     for (const item of reservationCounter) {
-      if (!map.has(item.movieId)) {
+      if (item.movieId && !map.has(item.movieId)) {
         map.set(item.movieId, true); // set any value to Map
         result.push({
           movieId: item.movieId,
@@ -70,9 +73,10 @@ class Dashboard extends Component {
       .sort((a, b) => b.count - a.count)
       .slice(0, total)
       .map(res => ({
-        movie: movies.find(movie => movie._id === res.movieId),
+        movie: movies.find(movie => String(movie._id) === String(res.movieId)),
         count: res.count
-      }));
+      }))
+      .filter(item => item && item.movie && item.movie.title);
   };
 
   render() {

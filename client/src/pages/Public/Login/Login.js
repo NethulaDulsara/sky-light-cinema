@@ -19,16 +19,15 @@ const styles = theme => ({
     }
   },
   bg: {
-    backgroundColor: theme.palette.common.neutral,
+    backgroundColor: '#0a0e17',
     height: '100%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundImage: 'url(https://source.unsplash.com/featured/?cinema)',
+    backgroundImage: 'linear-gradient(180deg, rgba(10, 14, 23, 0.4) 0%, rgba(10, 14, 23, 0.9) 100%), url(https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1200&q=80)',
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-    opacity: 0.5
+    backgroundPosition: 'center'
   },
   content: {
     height: '100%',

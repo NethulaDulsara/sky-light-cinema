@@ -88,32 +88,100 @@ class ReservationsTable extends Component {
                     hover
                     key={reservation._id}>
                     <TableCell className={classes.tableCell}>
-                      {reservation.username}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #00C6FF 0%, #7928CA 100%)',
+                          color: '#ffffff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          fontSize: '12px'
+                        }}>
+                          {(reservation.username || 'G').charAt(0).toUpperCase()}
+                        </div>
+                        <span style={{ fontWeight: 600, color: '#f8fafc' }}>
+                          {reservation.username}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {reservation.phone}
+                      <span style={{ color: '#94a3b8', fontFamily: 'monospace' }}>
+                        {reservation.phone}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {this.getCreatedAt(reservation).toLocaleString()}
+                      <span style={{ color: '#94a3b8', fontSize: '12px' }}>
+                        {this.getCreatedAt(reservation).toLocaleDateString()}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {reservation.startAt}
+                      <span style={{
+                        color: '#00C6FF',
+                        background: 'rgba(0, 198, 255, 0.08)',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        fontWeight: 600
+                      }}>
+                        {reservation.startAt}
+                      </span>
                     </TableCell>
 
                     <TableCell className={classes.tableCell}>
-                      {this.onFindAttr(reservation.movieId, movies, 'title')}
+                      {(() => {
+                        const title = this.onFindAttr(reservation.movieId, movies, 'title');
+                        if (title && title !== 'Not title Found') {
+                          return <span style={{ fontWeight: 600, color: '#f8fafc' }}>{title}</span>;
+                        }
+                        return (
+                          <span style={{ color: '#94a3b8', fontStyle: 'italic', background: 'rgba(255,255,255,0.04)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px' }}>
+                            Past Screening
+                          </span>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {this.onFindAttr(reservation.cinemaId, cinemas, 'name')}
+                      <span style={{ color: '#cbd5e1' }}>
+                        {this.onFindAttr(reservation.cinemaId, cinemas, 'name')}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {reservation.ticketPrice}
+                      <span style={{ color: '#94a3b8' }}>
+                        LKR {reservation.ticketPrice}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {reservation.total}
+                      <span style={{ color: '#10b981', fontWeight: 700 }}>
+                        LKR {reservation.total}
+                      </span>
                     </TableCell>
                     <TableCell className={classes.tableCell}>
-                      {reservation.checkin ? 'yes' : 'no'}
+                      <span style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        background: reservation.checkin ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.12)',
+                        color: reservation.checkin ? '#34d399' : '#fbbf24',
+                        border: reservation.checkin ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(245, 158, 11, 0.25)'
+                      }}>
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          backgroundColor: reservation.checkin ? '#34d399' : '#fbbf24'
+                        }} />
+                        {reservation.checkin ? 'Checked In' : 'Pending'}
+                      </span>
                     </TableCell>
                   </TableRow>
                 ))}

@@ -7,64 +7,71 @@ export default {
   common: {
     black,
     white,
-    commonBackground: 'rgb(45, 45, 45)',
+    commonBackground: '#111625',
     contrastText: white,
     neutral: '#E4E7EB',
-    muted: '#9EA0A4'
+    muted: '#94a3b8'
   },
   default: {
-    light: 'rgba(41, 150, 243, .1)',
-    main: 'rgba(0, 40, 73, .9)',
-    dark: 'rgb(0, 40, 73)',
-    logoBg: 'rgb(51, 51, 51)',
-    border: 'rgba(0, 40, 73, .1)',
+    light: 'rgba(0, 198, 255, 0.08)',
+    main: '#00C6FF',
+    dark: '#0c101c',
+    logoBg: '#131b2e',
+    border: 'rgba(255, 255, 255, 0.08)',
     contrastText: white
   },
   primary: {
-    light: lightBlue[300],
-    main: lightBlue[500],
-    dark: lightBlue[700],
+    light: '#56CCF2',
+    main: '#00C6FF',
+    dark: '#0072FF',
+    contrastText: white
+  },
+  secondary: {
+    light: '#FF0080',
+    main: '#7928CA',
+    dark: '#4C1D95',
     contrastText: white
   },
   success: {
-    light: green[300],
-    main: green[500],
-    dark: green[700],
+    light: '#4ade80',
+    main: '#10b981',
+    dark: '#059669',
     contrastText: white
   },
   info: {
-    light: blue[300],
-    main: blue[500],
-    dark: blue[700],
+    light: '#67e8f9',
+    main: '#06b6d4',
+    dark: '#0e7490',
     contrastText: white
   },
   warning: {
-    light: yellow[300],
-    main: yellow[500],
-    dark: yellow[700],
+    light: '#fde047',
+    main: '#f59e0b',
+    dark: '#d97706',
     contrastText: white
   },
   danger: {
-    light: red[300],
-    main: red[500],
-    dark: red[700],
+    light: '#f87171',
+    main: '#ef4444',
+    dark: '#dc2626',
     contrastText: white
   },
   background: {
-    paper: 'rgb(45, 45, 45)',
-    default: 'rgb(26, 26, 26)',
-    dark: 'rgb(26, 26, 26)'
+    paper: '#111625',
+    default: '#0a0e17',
+    dark: '#070a10'
   },
   text: {
-    primary: white,
-    secondary: '#9EA0A4',
-    link: lightBlue[300]
+    primary: '#f8fafc',
+    secondary: '#94a3b8',
+    link: '#00C6FF'
   },
-  border: '#DFE3E8',
-  divider: '#DFE3E8',
-  oxfordBlue: 'rgba(5, 41, 73, 1)',
-  prussianBlue: 'rgba(19, 49, 92, 1)',
-  darkCerulean: 'rgba(19, 64, 116, 1)',
-  pewterBlue: 'rgba(141, 169, 196, 1)',
-  isabelline: 'rgba(238, 244, 237, 1)'
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderShadow: 'rgba(0, 0, 0, 0.5)',
+  divider: 'rgba(255, 255, 255, 0.08)',
+  oxfordBlue: '#0c101c',
+  prussianBlue: '#0f172a',
+  darkCerulean: '#1e293b',
+  pewterBlue: '#94a3b8',
+  isabelline: '#f8fafc'
 };

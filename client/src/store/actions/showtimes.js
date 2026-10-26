@@ -38,7 +38,7 @@ export const getShowtimes = () => async dispatch => {
 export const addShowtime = showtime => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
-    const url = '/showtimes/';
+    const url = '/showtimes';
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -47,15 +47,26 @@ export const addShowtime = showtime => async dispatch => {
       },
       body: JSON.stringify(showtime)
     });
+    const responseData = await response.json();
     if (response.ok) {
       dispatch(setAlert('Showtime Created', 'success', 5000));
+      dispatch(getShowtimes());
+      dispatch(toggleDialog());
       return { status: 'success', message: 'Showtime Created' };
+    } else {
+      const errMsg =
+        responseData.message ||
+        responseData.error ||
+        (responseData.errors && Object.values(responseData.errors).map(e => e.message).join(', ')) ||
+        'Failed to save showtime. Please check required fields.';
+      dispatch(setAlert(errMsg, 'error', 5000));
+      return { status: 'error', message: errMsg };
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return {
       status: 'error',
-      message: ' Cinema have not been saved, try again.'
+      message: 'Showtime could not be saved, try again.'
     };
   }
 };
@@ -72,15 +83,25 @@ export const updateShowtime = (showtime, id) => async dispatch => {
       },
       body: JSON.stringify(showtime)
     });
+    const responseData = await response.json();
     if (response.ok) {
-      dispatch(setAlert('Showtime Created', 'success', 5000));
-      return { status: 'success', message: 'Showtime Created' };
+      dispatch(setAlert('Showtime Updated', 'success', 5000));
+      dispatch(getShowtimes());
+      dispatch(toggleDialog());
+      return { status: 'success', message: 'Showtime Updated' };
+    } else {
+      const errMsg =
+        responseData.message ||
+        responseData.error ||
+        'Failed to update showtime.';
+      dispatch(setAlert(errMsg, 'error', 5000));
+      return { status: 'error', message: errMsg };
     }
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return {
       status: 'error',
-      message: ' Cinema have not been saved, try again.'
+      message: 'Showtime could not be updated, try again.'
     };
   }
 };

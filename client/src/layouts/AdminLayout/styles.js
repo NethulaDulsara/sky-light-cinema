@@ -5,37 +5,39 @@ export default theme => ({
     top: 0,
     left: 0,
     right: 'auto',
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+    zIndex: theme.zIndex.appBar + 1
   },
   drawerPaper: {
-    borderRight: 0,
-    zIndex: 1200,
-    width: '271px',
-    top: theme.topBar.height
+    borderRight: '1px solid rgba(255, 255, 255, 0.06)',
+    backgroundColor: '#0c101c',
+    zIndex: theme.zIndex.appBar - 1,
+    width: '270px',
+    top: theme.topBar.height,
+    height: `calc(100vh - ${theme.topBar.height})`,
+    overflowY: 'auto'
+  },
+  drawerPaperMobile: {
+    borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#0c101c',
+    zIndex: 1400,
+    width: '270px',
+    height: '100%',
+    overflowY: 'auto'
   },
   sidebar: {
     width: '270px'
   },
   content: {
-    height: '100%',
+    minHeight: '100vh',
     padding: theme.spacing(3),
-    paddingTop: theme.spacing(9),
+    paddingTop: `calc(${theme.topBar.height} + ${theme.spacing(3)}px)`,
+    marginLeft: '270px',
     backgroundColor: theme.palette.background.default,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
-  },
-  contentShift: {
-    marginLeft: '270px'
-  },
-  [theme.breakpoints.down('sm')]: {
-    content: {
-      padding: 0,
-      paddingTop: theme.spacing(9)
+    transition: 'margin-left 0.2s ease',
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: 0,
+      padding: theme.spacing(2),
+      paddingTop: `calc(${theme.topBar.height} + ${theme.spacing(2)}px)`
     }
   }
 });
