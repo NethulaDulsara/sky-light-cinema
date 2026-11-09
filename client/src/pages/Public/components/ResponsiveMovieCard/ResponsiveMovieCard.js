@@ -6,6 +6,7 @@ import styles from './styles';
 // import FavoriteIcon from '@material-ui/icons/Favorite';
 // import CaledarIcon from '@material-ui/icons/CalendarToday';
 import { textTruncate } from '../../../../utils';
+import { POSTER_PLACEHOLDER } from '../../../../utils/poster';
 import { Link } from 'react-router-dom';
 
 const MovieCard = props => {
@@ -69,7 +70,7 @@ const MovieCard = props => {
         <div
           className={classes.blurBackground}
           style={{
-            backgroundImage: `url("${getImageUrl(movie.image)}")`,
+            backgroundImage: `url("${getImageUrl(movie.image)}"), url("${POSTER_PLACEHOLDER}")`,
           }}
         />
       </Paper>

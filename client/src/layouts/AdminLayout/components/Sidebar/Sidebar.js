@@ -15,9 +15,14 @@ import TheatersIcon from '@material-ui/icons/TheatersOutlined';
 import StoreMallDirectoryIcon from '@material-ui/icons/StoreMallDirectoryOutlined';
 import ScheduleIcon from '@material-ui/icons/ScheduleOutlined';
 import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumberOutlined';
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActiveOutlined';
+import AssessmentIcon from '@material-ui/icons/AssessmentOutlined';
 import PeopleAltIcon from '@material-ui/icons/PeopleAltOutlined';
 import AccountCircleIcon from '@material-ui/icons/AccountCircleOutlined';
+import SettingsIcon from '@material-ui/icons/SettingsOutlined';
 import HeadsetMicIcon from '@material-ui/icons/HeadsetMicOutlined';
+import PointOfSaleIcon from '@material-ui/icons/ShoppingCartOutlined';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccountOutlined';
 
 import styles from './styles';
 
@@ -99,6 +104,32 @@ class Sidebar extends Component {
               primary="Reservations"
             />
           </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/admin/notify">
+            <ListItemIcon className={classes.listItemIcon}>
+              <NotificationsActiveIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Watchlist"
+            />
+          </ListItem>
+          <ListItem
+            activeClassName={classes.activeListItem}
+            className={classes.listItem}
+            component={NavLink}
+            to="/pos">
+            <ListItemIcon className={classes.listItemIcon}>
+              <PointOfSaleIcon />
+            </ListItemIcon>
+            <ListItemText
+              classes={{ primary: classes.listItemText }}
+              primary="Box Office (POS)"
+            />
+          </ListItem>
         </List>
 
         <Divider className={classes.listDivider} />
@@ -123,6 +154,51 @@ class Sidebar extends Component {
               <ListItemText
                 classes={{ primary: classes.listItemText }}
                 primary="Users"
+              />
+            </ListItem>
+          )}
+          {user && user.role === 'superadmin' && (
+            <ListItem
+              activeClassName={classes.activeListItem}
+              className={classes.listItem}
+              component={NavLink}
+              to="/admin/cashiers">
+              <ListItemIcon className={classes.listItemIcon}>
+                <SupervisorAccountIcon />
+              </ListItemIcon>
+              <ListItemText
+                classes={{ primary: classes.listItemText }}
+                primary="Cashiers"
+              />
+            </ListItem>
+          )}
+          {user && user.role === 'superadmin' && (
+            <ListItem
+              activeClassName={classes.activeListItem}
+              className={classes.listItem}
+              component={NavLink}
+              to="/admin/reports">
+              <ListItemIcon className={classes.listItemIcon}>
+                <AssessmentIcon />
+              </ListItemIcon>
+              <ListItemText
+                classes={{ primary: classes.listItemText }}
+                primary="Reports"
+              />
+            </ListItem>
+          )}
+          {user && user.role === 'superadmin' && (
+            <ListItem
+              activeClassName={classes.activeListItem}
+              className={classes.listItem}
+              component={NavLink}
+              to="/admin/settings">
+              <ListItemIcon className={classes.listItemIcon}>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText
+                classes={{ primary: classes.listItemText }}
+                primary="Settings"
               />
             </ListItem>
           )}

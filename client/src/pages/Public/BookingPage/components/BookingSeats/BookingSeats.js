@@ -67,7 +67,7 @@ const useStyles = makeStyles(theme => ({
   },
   seat: {
     cursor: 'pointer',
-    borderRadius: '4px',
+    borderRadius: '7px',
     padding: '6px',
     margin: '0 4px',
     fontSize: '10px',
@@ -77,23 +77,33 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    border: '1px solid rgba(255,255,255,0.4)',
+    border: '1px solid rgba(255,255,255,0.35)',
     color: '#fff',
-    transition: 'all 0.2s',
+    transition: 'all 0.18s ease',
+    outline: 'none',
     '&:hover': {
-      borderColor: '#fff'
+      borderColor: '#00C6FF',
+      backgroundColor: 'rgba(0,198,255,0.12)',
+      transform: 'translateY(-1px)'
+    },
+    '&:focus-visible': {
+      borderColor: '#00C6FF',
+      boxShadow: '0 0 0 2px rgba(0,198,255,0.6)'
     }
   },
   seatOccupied: {
     backgroundColor: '#e63946',
     borderColor: '#e63946',
     color: '#fff',
-    cursor: 'not-allowed'
+    cursor: 'not-allowed',
+    '&:hover': { transform: 'none', backgroundColor: '#e63946', borderColor: '#e63946' }
   },
   seatSelected: {
     backgroundColor: '#00cc66',
     borderColor: '#00cc66',
-    color: '#fff'
+    color: '#fff',
+    boxShadow: '0 0 12px rgba(0,204,102,0.55)',
+    '&:hover': { backgroundColor: '#00cc66', borderColor: '#00cc66' }
   },
   seatUnavailable: {
     backgroundColor: '#4a4a5a',
@@ -141,8 +151,43 @@ export default function BookingSeats(props) {
       case 1: return classes.seatOccupied;
       case 2: return classes.seatSelected;
       case 3: return classes.seatSelected; // Using selected style for recommended
+      case 4: return classes.seatUnavailable; // Frozen / blocked by admin
       default: return ''; // Available (default outline)
     }
+  };
+
+  // Accessible seat button: keyboard operable, labelled by seat + state.
+  const renderSeat = (seat, indexRow, realIndex, rowLabel, keyPrefix) => {
+    const occupied = seat === 1;
+    const frozen = seat === 4;
+    const blocked = occupied || frozen;
+    const selected = seat === 2 || seat === 3;
+    const label = `Seat ${rowLabel}${realIndex + 1}, ${
+      frozen ? 'unavailable' : occupied ? 'unavailable' : selected ? 'selected' : 'available'
+    }`;
+    const activate = () => {
+      if (!blocked) onSelectSeat(indexRow, realIndex);
+    };
+    return (
+      <div
+        key={`${keyPrefix}-${realIndex}`}
+        role="button"
+        aria-label={label}
+        aria-pressed={selected}
+        aria-disabled={blocked}
+        tabIndex={blocked ? -1 : 0}
+        onClick={activate}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            activate();
+          }
+        }}
+        className={`${classes.seat} ${getSeatClass(seat)}`}
+      >
+        {rowLabel}{realIndex + 1}
+      </div>
+    );
   };
 
   return (
@@ -150,7 +195,13 @@ export default function BookingSeats(props) {
       {/* Top Header */}
       <div className={classes.topBar}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div className={classes.backButton} onClick={onHideSeatSelection}>
+          <div
+            className={classes.backButton}
+            role="button"
+            tabIndex={0}
+            aria-label="Back to available showtimes"
+            onClick={onHideSeatSelection}
+            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && onHideSeatSelection()}>
             <ArrowBackIosIcon style={{ fontSize: '14px', marginRight: '4px' }} />
             Available Showtimes
           </div>
@@ -170,40 +221,28 @@ export default function BookingSeats(props) {
       </div>
 
       {/* Seat Map */}
-      <div className={classes.seatMapContainer}>
+      <div
+        className={classes.seatMapContainer}
+        role="group"
+        aria-label="Seat selection. Use Tab to move between seats and Enter or Space to select.">
         {seats.length > 0 &&
           seats.map((seatRows, indexRow) => {
             const rowLabel = String.fromCharCode(65 + seats.length - 1 - indexRow);
+            const half = Math.ceil(seatRows.length / 2);
             return (
-              <div key={indexRow} className={classes.row}>
-                <div className={classes.rowLabel}>{rowLabel}</div>
-                {/* Divide the row into two blocks just for visual layout if possible, or just space them */}
+              <div key={indexRow} className={classes.row} role="row">
+                <div className={classes.rowLabel} aria-hidden="true">{rowLabel}</div>
                 <div style={{ display: 'flex', paddingRight: '20px' }}>
-                  {seatRows.slice(0, Math.ceil(seatRows.length / 2)).map((seat, index) => (
-                    <div
-                      key={`seat-left-${index}`}
-                      onClick={() => seat !== 1 && onSelectSeat(indexRow, index)}
-                      className={`${classes.seat} ${getSeatClass(seat)}`}
-                    >
-                      {rowLabel}{index + 1}
-                    </div>
-                  ))}
+                  {seatRows
+                    .slice(0, half)
+                    .map((seat, index) => renderSeat(seat, indexRow, index, rowLabel, 'seat-left'))}
                 </div>
                 <div style={{ display: 'flex', paddingLeft: '20px' }}>
-                  {seatRows.slice(Math.ceil(seatRows.length / 2)).map((seat, index) => {
-                    const realIndex = Math.ceil(seatRows.length / 2) + index;
-                    return (
-                      <div
-                        key={`seat-right-${index}`}
-                        onClick={() => seat !== 1 && onSelectSeat(indexRow, realIndex)}
-                        className={`${classes.seat} ${getSeatClass(seat)}`}
-                      >
-                        {rowLabel}{realIndex + 1}
-                      </div>
-                    );
-                  })}
+                  {seatRows.slice(half).map((seat, index) =>
+                    renderSeat(seat, indexRow, half + index, rowLabel, 'seat-right')
+                  )}
                 </div>
-                <div className={classes.rowLabel}>{rowLabel}</div>
+                <div className={classes.rowLabel} aria-hidden="true">{rowLabel}</div>
               </div>
             );
           })}

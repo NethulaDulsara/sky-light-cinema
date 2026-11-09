@@ -11,6 +11,7 @@ import MomentUtils from '@date-io/moment';
 
 import styles from './styles';
 import { addShowtime, updateShowtime, toggleDialog } from '../../../../../store/actions';
+import SeatFreezePicker from '../../../../../components/SeatFreezePicker';
 
 class AddShowtime extends Component {
   state = {
@@ -18,25 +19,43 @@ class AddShowtime extends Component {
     startDate: new Date(),
     endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     movieId: '',
-    cinemaId: ''
+    cinemaId: '',
+    format: '2D',
+    frozenSeats: [],
+    formatOptions: ['2D', '3D', 'IMAX', '4DX']
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const { movies, cinemas, selectedShowtime } = this.props;
+    // Load the admin-configured screen formats.
+    try {
+      const res = await fetch('/settings');
+      if (res.ok) {
+        const s = await res.json();
+        const opts = (s.formats || []).filter(f => f.enabled).map(f => f.name);
+        if (opts.length) this.setState({ formatOptions: opts });
+      }
+    } catch (e) {
+      /* fall back to defaults */
+    }
     if (selectedShowtime) {
       const {
         startAt,
         startDate,
         endDate,
         movieId,
-        cinemaId
+        cinemaId,
+        format,
+        frozenSeats
       } = selectedShowtime;
       this.setState({
         startAt,
         startDate: startDate ? new Date(startDate) : new Date(),
         endDate: endDate ? new Date(endDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         movieId,
-        cinemaId
+        cinemaId,
+        format: format || '2D',
+        frozenSeats: frozenSeats || []
       });
     } else {
       this.setState({
@@ -54,7 +73,7 @@ class AddShowtime extends Component {
 
   onAddShowtime = () => {
     const { movies, cinemas } = this.props;
-    const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
+    const { startAt, startDate, endDate, movieId, cinemaId, format, frozenSeats } = this.state;
     const finalMovieId = movieId || (movies[0] && movies[0]._id);
     const finalCinemaId = cinemaId || (cinemas[0] && cinemas[0]._id);
     const finalStartDate = startDate || new Date();
@@ -66,19 +85,23 @@ class AddShowtime extends Component {
       startDate: finalStartDate,
       endDate: finalEndDate,
       movieId: finalMovieId,
-      cinemaId: finalCinemaId
+      cinemaId: finalCinemaId,
+      format: format || '2D',
+      frozenSeats: frozenSeats || []
     };
     this.props.addShowtime(showtime);
   };
 
   onUpdateShowtime = () => {
-    const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
+    const { startAt, startDate, endDate, movieId, cinemaId, format, frozenSeats } = this.state;
     const showtime = {
       startAt: startAt || '13:00',
       startDate: startDate || new Date(),
       endDate: endDate || new Date(),
       movieId,
-      cinemaId
+      cinemaId,
+      format: format || '2D',
+      frozenSeats: frozenSeats || []
     };
     this.props.updateShowtime(showtime, this.props.selectedShowtime._id);
   };
@@ -101,7 +124,9 @@ class AddShowtime extends Component {
 
   render() {
     const { movies, cinemas, classes, className } = this.props;
-    const { startAt, startDate, endDate, movieId, cinemaId } = this.state;
+    const { startAt, startDate, endDate, movieId, cinemaId, format, formatOptions, frozenSeats } = this.state;
+    const selectedCinema = cinemas.find(c => c._id === cinemaId);
+    const cinemaSeats = selectedCinema ? selectedCinema.seats : [];
 
     const rootClassName = classNames(classes.root, className);
     const submitButton = this.props.selectedShowtime
@@ -170,6 +195,21 @@ class AddShowtime extends Component {
             )}
           </TextField>
 
+          <TextField
+            select
+            className={classes.field}
+            label="Screen Format"
+            helperText="Drives the ticket price multiplier"
+            value={format}
+            variant="outlined"
+            onChange={event => this.handleFieldChange('format', event.target.value)}>
+            {formatOptions.map(f => (
+              <MenuItem key={`fmt-${f}`} value={f}>
+                {f}
+              </MenuItem>
+            ))}
+          </TextField>
+
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <div className={classes.row}>
               <KeyboardDatePicker
@@ -203,6 +243,23 @@ class AddShowtime extends Component {
               />
             </div>
           </MuiPickersUtilsProvider>
+
+          {cinemaSeats && cinemaSeats.length > 0 && (
+            <div className={classes.field}>
+              <div style={{ fontWeight: 700, marginTop: 8 }}>
+                Freeze Seats (this screening only)
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: 13, marginBottom: 8 }}>
+                These are blocked for this showtime, in addition to any seats frozen
+                hall-wide on the cinema.
+              </div>
+              <SeatFreezePicker
+                seats={cinemaSeats}
+                value={frozenSeats}
+                onChange={fs => this.setState({ frozenSeats: fs })}
+              />
+            </div>
+          )}
 
           <div className={classes.actions}>
             <Button

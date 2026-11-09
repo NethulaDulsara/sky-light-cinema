@@ -28,6 +28,10 @@ class AddMovie extends Component {
     description: '',
     director: '',
     cast: '',
+    trailerUrl: '',
+    certification: '',
+    imdbRating: '',
+    gallery: '',
     releaseDate: new Date(),
     endDate: new Date(),
     loading: false
@@ -43,6 +47,10 @@ class AddMovie extends Component {
         cast,
         description,
         duration,
+        trailerUrl,
+        certification,
+        imdbRating,
+        gallery,
         releaseDate,
         endDate
       } = this.props.edit;
@@ -54,6 +62,10 @@ class AddMovie extends Component {
         cast,
         description,
         duration,
+        trailerUrl: trailerUrl || '',
+        certification: certification || '',
+        imdbRating: imdbRating || '',
+        gallery: Array.isArray(gallery) ? gallery.join(', ') : (gallery || ''),
         releaseDate,
         endDate
       });
@@ -130,6 +142,10 @@ class AddMovie extends Component {
       description,
       director,
       cast,
+      trailerUrl,
+      certification,
+      imdbRating,
+      gallery,
       releaseDate,
       endDate,
       image
@@ -145,6 +161,10 @@ class AddMovie extends Component {
       description: description.trim(),
       director: director.trim(),
       cast: cast.trim(),
+      trailerUrl: trailerUrl ? trailerUrl.trim() : '',
+      certification: certification ? certification.trim() : '',
+      imdbRating: imdbRating !== '' && imdbRating != null ? Number(imdbRating) : undefined,
+      gallery: gallery ? gallery.split(',').map(s => s.trim()).filter(Boolean) : [],
       releaseDate: releaseDate ? (releaseDate.toDate ? releaseDate.toDate() : (releaseDate._d || releaseDate)) : new Date(),
       endDate: endDate ? (endDate.toDate ? endDate.toDate() : (endDate._d || endDate)) : new Date()
     };
@@ -167,6 +187,10 @@ class AddMovie extends Component {
       description,
       director,
       cast,
+      trailerUrl,
+      certification,
+      imdbRating,
+      gallery,
       releaseDate,
       endDate,
       image
@@ -182,6 +206,10 @@ class AddMovie extends Component {
       description: description.trim(),
       director: director.trim(),
       cast: cast.trim(),
+      trailerUrl: trailerUrl ? trailerUrl.trim() : '',
+      certification: certification ? certification.trim() : '',
+      imdbRating: imdbRating !== '' && imdbRating != null ? Number(imdbRating) : undefined,
+      gallery: gallery ? gallery.split(',').map(s => s.trim()).filter(Boolean) : [],
       releaseDate: releaseDate ? (releaseDate.toDate ? releaseDate.toDate() : (releaseDate._d || releaseDate)) : new Date(),
       endDate: endDate ? (endDate.toDate ? endDate.toDate() : (endDate._d || endDate)) : new Date()
     };
@@ -213,6 +241,10 @@ class AddMovie extends Component {
       description,
       director,
       cast,
+      trailerUrl,
+      certification,
+      imdbRating,
+      gallery,
       releaseDate,
       endDate,
       loading
@@ -330,6 +362,58 @@ class AddMovie extends Component {
               variant="outlined"
               onChange={event =>
                 this.handleFieldChange('cast', event.target.value)
+              }
+            />
+          </div>
+
+          <div className={classes.row}>
+            <TextField
+              className={classes.field}
+              label="Trailer URL (YouTube)"
+              placeholder="e.g. https://www.youtube.com/watch?v=YoHD9XEInc0"
+              value={trailerUrl}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('trailerUrl', event.target.value)
+              }
+            />
+          </div>
+
+          <div className={classes.row}>
+            <TextField
+              className={classes.field}
+              label="Gallery image URLs (comma separated)"
+              placeholder="https://.../still1.jpg, https://.../still2.jpg"
+              value={gallery}
+              variant="outlined"
+              multiline
+              onChange={event =>
+                this.handleFieldChange('gallery', event.target.value)
+              }
+            />
+          </div>
+
+          <div className={classes.row}>
+            <TextField
+              className={classes.field}
+              label="Certification"
+              placeholder="e.g. PG-13"
+              value={certification}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('certification', event.target.value)
+              }
+            />
+            <TextField
+              className={classes.field}
+              label="IMDb Rating (0-10)"
+              placeholder="e.g. 8.8"
+              type="number"
+              inputProps={{ min: 0, max: 10, step: 0.1 }}
+              value={imdbRating}
+              variant="outlined"
+              onChange={event =>
+                this.handleFieldChange('imdbRating', event.target.value)
               }
             />
           </div>

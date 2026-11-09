@@ -7,7 +7,6 @@ import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import { Redirect } from 'react-router-dom';
 import { setAlert } from '../../../store/actions/alert';
 import { updateReservation } from '../../../store/actions/reservations';
-import MockPaymentGateway from './components/MockPaymentGateway/MockPaymentGateway';
 
 const MastercardLogo = () => (
   <svg width="36" height="24" viewBox="0 0 36 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -236,21 +235,42 @@ const styles = theme => ({
       backgroundColor: '#ccc',
       color: '#666'
     }
+  },
+  disclaimer: {
+    marginTop: theme.spacing(2),
+    fontSize: '11px',
+    lineHeight: 1.6,
+    color: '#64748b'
+  },
+  disclaimerLink: {
+    color: '#2a265f',
+    fontWeight: 600,
+    textDecoration: 'underline'
   }
 });
 
 class PaymentPage extends Component {
   state = {
-    timeLeft: 300, // 5 minutes
+    timeLeft: this.getInitialTimeLeft(),
     selectedPayment: 'visa',
     agreedToTerms: false,
-    isMockGatewayOpen: false,
     formData: {
       name: '',
       email: '',
       mobile: ''
     }
   };
+
+  // Seconds remaining on the seat hold (driven by the reservation's real
+  // holdExpiresAt so the timer matches when the backend releases the seats).
+  getInitialTimeLeft() {
+    const state = this.props.location && this.props.location.state;
+    if (state && state.holdExpiresAt) {
+      const secs = Math.floor((new Date(state.holdExpiresAt).getTime() - Date.now()) / 1000);
+      if (secs > 0) return Math.min(secs, 1800);
+    }
+    return 300;
+  }
 
   componentDidMount() {
     if (!window.payhere) {
@@ -304,7 +324,8 @@ class PaymentPage extends Component {
 
   handlePayment = async () => {
     const { formData, agreedToTerms } = this.state;
-    const { match, updateReservation, setAlert, history, location } = this.props;
+    const { match, updateReservation, setAlert, history, location, user } = this.props;
+    const successRedirect = user ? '/mydashboard' : '/';
     
     if (!formData.name || !formData.email || !formData.mobile) {
       return setAlert('Please fill in all details', 'error', 3000);
@@ -362,9 +383,19 @@ class PaymentPage extends Component {
       };
 
       // 4. Handle Callbacks
-      window.payhere.onCompleted = function onCompleted(orderId) {
+      window.payhere.onCompleted = async function onCompleted(orderId) {
+        // PayHere cannot reach a localhost notify_url, so confirm server-side here.
+        try {
+          await fetch(`/reservations/${reservationId}/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId: orderId })
+          });
+        } catch (err) {
+          /* the webhook will reconcile in a real deployment */
+        }
         setAlert('Payment Successful & Booking Confirmed!', 'success', 5000);
-        history.push('/');
+        history.push(successRedirect);
       };
 
       window.payhere.onDismissed = function onDismissed() {
@@ -400,11 +431,15 @@ class PaymentPage extends Component {
       cinemaName,
       date,
       time,
+      format,
       seats,
       totalPrice,
+      breakdown,
       adultCount,
       childCount
     } = bookingData;
+
+    const bd = breakdown || { subtotal: totalPrice, convenienceFee: 0, vat: 0, total: totalPrice };
 
     const formatPrice = (price) => {
       return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -519,16 +554,31 @@ class PaymentPage extends Component {
                       color="primary"
                     />
                   }
-                  label={<Typography style={{ fontSize: '13px' }}>By clicking "Make Payment" you agree to the Terms & Conditions.</Typography>}
+                  label={
+                    <Typography style={{ fontSize: '13px' }}>
+                      By clicking "Make Payment" you agree to our{' '}
+                      <a href="/#/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#2a265f', fontWeight: 700 }}>
+                        Terms &amp; Conditions
+                      </a>.
+                    </Typography>
+                  }
                 />
 
-                <Button 
+                <Button
                   className={classes.payButton}
                   disabled={!agreedToTerms || !formData.name || !formData.email || !formData.mobile}
                   onClick={this.handlePayment}
                 >
                   PAY NOW LKR {formatPrice(totalPrice)}
                 </Button>
+
+                <Typography className={classes.disclaimer}>
+                  Disclaimer: All prices are in LKR and include applicable taxes. Payments are
+                  processed securely by PayHere; we do not store your card details. All sales are
+                  final except as permitted by our refund policy. See our{' '}
+                  <a href="/#/terms" target="_blank" rel="noopener noreferrer" className={classes.disclaimerLink}>Terms &amp; Conditions</a>{' '}and{' '}
+                  <a href="/#/disclaimer" target="_blank" rel="noopener noreferrer" className={classes.disclaimerLink}>Disclaimer</a>.
+                </Typography>
               </Box>
             </Grid>
 
@@ -551,30 +601,35 @@ class PaymentPage extends Component {
                 </Box>
                 
                 <Typography className={classes.movieDetails}>
-                  DIGITAL 2D, {new Date(date).toDateString().toUpperCase()}, {time}<br/>
+                  {(format || '2D')}, {new Date(date).toDateString().toUpperCase()}, {time}<br/>
                   {cinemaName}<br/>
                   SEATS: {getSeatLabels()}<br/>
                   TICKETS: ODC ADULT x{adultCount} {childCount > 0 ? `, ODC CHILD x${childCount}` : ''}
                 </Typography>
 
                 <Typography className={classes.summaryTitle}>ORDER SUMMARY</Typography>
-                
+
                 <div className={classes.summaryRow}>
-                  <span>Total Ticket(s) Price</span>
-                  <span>LKR {formatPrice(totalPrice)}</span>
+                  <span>Ticket(s) Subtotal</span>
+                  <span>LKR {formatPrice(bd.subtotal)}</span>
                 </div>
-                <div className={classes.summaryRow} style={{ fontSize: '11px', color: '#888' }}>
-                  <span>Bank Charges & VAT Included</span>
+                <div className={classes.summaryRow}>
+                  <span>Convenience Fee</span>
+                  <span>LKR {formatPrice(bd.convenienceFee)}</span>
+                </div>
+                <div className={classes.summaryRow}>
+                  <span>VAT</span>
+                  <span>LKR {formatPrice(bd.vat)}</span>
                 </div>
 
                 <div className={classes.subTotalRow}>
                   <span>SUB TOTAL</span>
-                  <span>LKR {formatPrice(totalPrice)}</span>
+                  <span>LKR {formatPrice(bd.total)}</span>
                 </div>
 
                 <div className={classes.payableBox}>
                   <span>PAYABLE AMOUNT</span>
-                  <span>LKR {formatPrice(totalPrice)}</span>
+                  <span>LKR {formatPrice(bd.total)}</span>
                 </div>
               </Box>
             </Grid>

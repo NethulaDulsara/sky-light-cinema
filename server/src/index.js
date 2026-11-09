@@ -14,6 +14,10 @@ const cinemaRouter = require('./routes/cinema');
 const showtimeRouter = require('./routes/showtime');
 const reservationRouter = require('./routes/reservation');
 const invitationsRouter = require('./routes/invitations');
+const settingsRouter = require('./routes/settings');
+const seatlocksRouter = require('./routes/seatlocks');
+const analyticsRouter = require('./routes/analytics');
+const notifyRouter = require('./routes/notify');
 
 const app = express();
 app.disable('x-powered-by');
@@ -23,9 +27,13 @@ const port = process.env.PORT || 8080;
 app.use(express.static(path.join(__dirname, '../../client/build')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
+// Restrict CORS to the configured client origin when provided; fall back to '*'
+// for local development where the client runs on an arbitrary localhost port.
+const allowedOrigin = process.env.CLIENT_URL || '*';
+
 app.use(function(req, res, next) {
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -48,6 +56,10 @@ app.use(cinemaRouter);
 app.use(showtimeRouter);
 app.use(reservationRouter);
 app.use(invitationsRouter);
+app.use(settingsRouter);
+app.use(seatlocksRouter);
+app.use(analyticsRouter);
+app.use(notifyRouter);
 
 // app.get('/api/test', (req, res) => res.send('Hello World'))
 

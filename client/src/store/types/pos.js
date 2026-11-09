@@ -1,0 +1,2 @@
+export const GET_POS_RESERVATIONS = 'GET_POS_RESERVATIONS';
+export const GET_POS_HELD = 'GET_POS_HELD';

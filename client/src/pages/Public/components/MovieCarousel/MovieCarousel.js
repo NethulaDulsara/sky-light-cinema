@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import { makeStyles, Typography, Button } from '@material-ui/core';
+import {
+  makeStyles,
+  Typography,
+  Button,
+  Dialog,
+  IconButton
+} from '@material-ui/core';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons';
+import CloseIcon from '@material-ui/icons/Close';
 import MovieCardSimple from '../MovieCardSimple/MovieCardSimple';
 import CinemaCard from '../CinemaCard/CinemaCard';
+import { youTubeId } from '../../../../utils/youtube';
 import styles from './styles';
 
 const useStyles = makeStyles(styles);
@@ -42,25 +50,50 @@ function MovieCarousel({
   autoplaySpeed = 3000
 }) {
   const classes = useStyles();
+  const [trailer, setTrailer] = useState(null); // { id, title }
+  const [showtimeMovieIds, setShowtimeMovieIds] = useState(null);
+
+  // Fetch which movies actually have showtimes (for the Buy Tickets state).
+  useEffect(() => {
+    if (type !== 'movie') return;
+    let active = true;
+    fetch('/showtimes')
+      .then(res => res.json())
+      .then(data => {
+        if (!active) return;
+        setShowtimeMovieIds(new Set((data || []).map(s => s.movieId)));
+      })
+      .catch(() => setShowtimeMovieIds(new Set()));
+    return () => {
+      active = false;
+    };
+  }, [type]);
+
+  const openTrailer = movie => {
+    const id = youTubeId(movie.trailerUrl);
+    if (id) setTrailer({ id, title: movie.title });
+  };
+  const closeTrailer = () => setTrailer(null);
 
   const isAutoplay = Boolean(autoplay && movies.length > 1);
   let displayMovies = movies;
-  if (isAutoplay && movies.length <= 4) {
-    while (displayMovies.length < 8) {
+  if (isAutoplay && movies.length < 9) {
+    while (displayMovies.length < 12) {
       displayMovies = [...displayMovies, ...movies];
     }
   }
 
-  const isInfinite = isAutoplay || movies.length > 4;
+  const isInfinite = isAutoplay || movies.length > 5;
 
   const settings = {
-    centerMode: false,
+    centerMode: true,
+    centerPadding: '0px',
     infinite: isInfinite,
     autoplay: isAutoplay,
     autoplaySpeed: autoplaySpeed,
     speed: 800,
     pauseOnHover: true,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
     swipeToSlide: true,
     nextArrow: <NextArrow infinite={isInfinite} />,
@@ -75,17 +108,10 @@ function MovieCarousel({
         }
       },
       {
-        breakpoint: 1250,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          infinite: isAutoplay || movies.length > 2
-        }
-      },
-      {
-        breakpoint: 750,
+        breakpoint: 1024,
         settings: {
           slidesToShow: 1,
+          centerPadding: '48px',
           slidesToScroll: 1,
           infinite: isAutoplay || movies.length > 1
         }
@@ -118,6 +144,10 @@ function MovieCarousel({
                 movie={movie}
                 index={i}
                 ifupcoming={title === 'Coming Soon'}
+                onPlayTrailer={openTrailer}
+                hasShowtimes={
+                  showtimeMovieIds ? showtimeMovieIds.has(movie._id) : true
+                }
               />
             )
           )}
@@ -133,6 +163,32 @@ function MovieCarousel({
           <Typography variant="subtitle1">Check back later for updates!</Typography>
         </div>
       )}
+
+      <Dialog
+        open={Boolean(trailer)}
+        onClose={closeTrailer}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{ className: classes.trailerPaper }}>
+        <IconButton
+          aria-label="Close trailer"
+          className={classes.trailerClose}
+          onClick={closeTrailer}>
+          <CloseIcon />
+        </IconButton>
+        {trailer && (
+          <div className={classes.trailerFrameWrap}>
+            <iframe
+              className={classes.trailerFrame}
+              src={`https://www.youtube.com/embed/${trailer.id}?autoplay=1&rel=0`}
+              title={`${trailer.title} trailer`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        )}
+      </Dialog>
     </div>
   );
 }

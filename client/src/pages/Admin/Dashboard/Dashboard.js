@@ -41,13 +41,48 @@ const styles = theme => ({
   }
 });
 
+const KpiCard = ({ label, value, accent }) => (
+  <div
+    style={{
+      background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      borderRadius: 14,
+      padding: '20px 22px'
+    }}>
+    <div style={{ fontSize: 13, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 1 }}>
+      {label}
+    </div>
+    <div style={{ fontSize: 28, fontWeight: 800, marginTop: 6, color: accent || '#fff' }}>
+      {value}
+    </div>
+  </div>
+);
+
+const lkr = n =>
+  'LKR ' + Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
+
 class Dashboard extends Component {
+  state = { analytics: null };
+
   componentDidMount() {
     this.props.getUsers();
     this.props.getCinemas();
     this.props.getMovies();
     this.props.getReservations();
+    this.fetchAnalytics();
   }
+
+  fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken');
+      const res = await fetch('/analytics', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) this.setState({ analytics: await res.json() });
+    } catch (e) {
+      /* non-fatal */
+    }
+  };
 
   getBestMovies = (reservations, movies, total = 5) => {
     if (!reservations || !reservations.length || !movies || !movies.length) {
@@ -81,6 +116,7 @@ class Dashboard extends Component {
 
   render() {
     const { classes, users, cinemas, movies, reservations } = this.props;
+    const { analytics } = this.state;
 
     return (
       <div className={classes.root}>
@@ -92,6 +128,49 @@ class Dashboard extends Component {
             Welcome back! Here's what's happening today.
           </Typography>
         </div>
+
+        {analytics && (
+          <Grid container spacing={4} style={{ marginBottom: 8 }}>
+            <Grid item lg={3} sm={6} xs={12}>
+              <KpiCard label="Total Revenue" value={lkr(analytics.totalRevenue)} accent="#4ade80" />
+            </Grid>
+            <Grid item lg={3} sm={6} xs={12}>
+              <KpiCard label="Tickets Sold" value={analytics.ticketsSold} accent="#60a5fa" />
+            </Grid>
+            <Grid item lg={3} sm={6} xs={12}>
+              <KpiCard label="Occupancy" value={`${analytics.occupancy.toFixed(1)}%`} accent="#f59e0b" />
+            </Grid>
+            <Grid item lg={3} sm={6} xs={12}>
+              <KpiCard label="Avg Order Value" value={lkr(analytics.avgOrderValue)} accent="#c084fc" />
+            </Grid>
+            {analytics.byFormat && Object.keys(analytics.byFormat).length > 0 && (
+              <Grid item xs={12}>
+                <div
+                  style={{
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 14,
+                    padding: '18px 22px'
+                  }}>
+                  <div style={{ fontSize: 13, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
+                    Revenue by Format
+                  </div>
+                  <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
+                    {Object.entries(analytics.byFormat).map(([fmt, v]) => (
+                      <div key={fmt}>
+                        <div style={{ fontSize: 15, fontWeight: 700 }}>{fmt}</div>
+                        <div style={{ fontSize: 13, opacity: 0.8 }}>
+                          {lkr(v.revenue)} · {v.tickets} tickets
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Grid>
+            )}
+          </Grid>
+        )}
+
         <Grid container spacing={4}>
           <Grid item lg={3} sm={6} xl={3} xs={12}>
             <TotalUsers users={users.length} />

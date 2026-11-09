@@ -4,7 +4,9 @@ export default theme => ({
     height: props => (props.height ? props.height : '100%'),
     width: '100%',
     color: theme.palette.common.white,
-    backgroundColor: theme.palette.background.dark
+    overflow: 'hidden',
+    backgroundColor: theme.palette.background.dark,
+    boxShadow: 'inset 0 -90px 110px -30px #070a10'
   },
   blurBackground: {
     position: 'absolute',
@@ -13,8 +15,10 @@ export default theme => ({
     height: '100%',
     right: 0,
     backgroundSize: 'cover',
+    backgroundPosition: 'center 22%',
     backgroundRepeat: 'no-repeat',
-    width: '100%'
+    width: '100%',
+    transform: 'scale(1.02)'
   },
   infoSection: {
     position: 'relative',
@@ -23,51 +27,73 @@ export default theme => ({
     alignItems: 'center',
     width: '100%',
     height: '100%',
-    backgroundBlendMode: 'multiply',
     background:
-      'linear-gradient(to right, rgba(0,0,0,.9) 25%, transparent 100%)',
+      'linear-gradient(to top, #070a10 1%, rgba(7,10,16,0.12) 40%, rgba(7,10,16,0) 70%), ' +
+      'linear-gradient(to right, rgba(7,10,16,0.97) 0%, rgba(7,10,16,0.72) 32%, rgba(7,10,16,0.25) 62%, rgba(7,10,16,0.05) 85%)',
     zIndex: 2
   },
   movieHeader: {
     position: 'relative',
-    padding: theme.spacing(3),
-    maxWidth: '60%'
+    padding: theme.spacing(3, 3, 3, 5),
+    maxWidth: 640
   },
   tag: {
-    padding: theme.spacing(0.3, 3),
+    display: 'inline-block',
+    padding: theme.spacing(0.4, 2),
     marginRight: theme.spacing(1),
-    border: '1px solid rgba(255,255,255,0.9)',
-    borderRadius: 25
+    fontSize: '0.78rem',
+    fontWeight: 600,
+    letterSpacing: '0.5px',
+    color: '#fff',
+    border: '1px solid rgba(255,255,255,0.22)',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(6px)',
+    WebkitBackdropFilter: 'blur(6px)'
   },
   movieTitle: {
-    maxWidth: '60%',
-    fontSize: '32px',
-    lineHeight: 1.2,
-    fontWeight: 400,
-    textTransform: 'capitalize'
+    maxWidth: '100%',
+    fontSize: '3.4rem',
+    lineHeight: 1.05,
+    fontWeight: 800,
+    letterSpacing: '-0.5px',
+    textTransform: 'capitalize',
+    textShadow: '0 2px 30px rgba(0,0,0,0.55)',
+    marginBottom: theme.spacing(1.5)
   },
   director: {
-    color: '#9ac7fa',
-    fontWeight: '500',
-    fontSize: '16px',
+    color: '#5bc4ff',
+    fontWeight: 600,
+    fontSize: '0.95rem',
+    letterSpacing: '0.3px',
     marginTop: theme.spacing(1)
   },
-
   duration: {
     display: 'inline-block',
-    marginTop: theme.spacing(2),
-    padding: theme.spacing(1),
-    border: '1px solid rgba(255,255,255,0.13)'
+    marginTop: theme.spacing(2.5),
+    padding: theme.spacing(0.6, 1.8),
+    fontSize: '0.82rem',
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    color: '#eaf7ff',
+    borderRadius: 999,
+    border: '1px solid rgba(0,198,255,0.4)',
+    backgroundColor: 'rgba(0,198,255,0.08)'
   },
   genre: {
     display: 'inline-block',
     color: '#cee4fd',
-    marginLeft: theme.spacing(2)
+    marginLeft: theme.spacing(2),
+    fontSize: '0.9rem',
+    letterSpacing: '0.4px',
+    textTransform: 'capitalize'
   },
   descriptionText: {
-    color: '#cfd6e1',
-    padding: theme.spacing(2, 0),
-    maxWidth: '60%'
+    color: 'rgba(255,255,255,0.82)',
+    fontSize: '1.02rem',
+    lineHeight: 1.7,
+    padding: theme.spacing(2.5, 0, 1),
+    maxWidth: 520
   },
   footer: {
     position: 'absolute',
@@ -88,51 +114,58 @@ export default theme => ({
       transitionDelay: '0.15s'
     }
   },
-  movieActions: { position: 'absolute', bottom: 0, right: 0 },
+  movieActions: {
+    position: 'absolute',
+    bottom: theme.spacing(5),
+    right: theme.spacing(6),
+    zIndex: 3
+  },
   button: {
-    width: 200,
-    height: 70,
-    borderRadius: 0,
+    minWidth: 190,
+    height: 56,
+    padding: theme.spacing(0, 3.5),
+    borderRadius: 999,
     zIndex: 2,
-    backgroundColor: 'rgba(13, 20, 36, 0.85)',
-    borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-    borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-    fontSize: '15px',
-    fontWeight: 600,
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    color: '#fff',
+    fontSize: '0.95rem',
+    fontWeight: 700,
     letterSpacing: '0.5px',
-    transition: 'all 0.2s ease',
+    boxShadow: '0 10px 30px rgba(0,114,255,0.45)',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
     '&:hover': {
-      backgroundColor: 'rgba(0, 0, 0, 0.95)',
-      color: '#00C6FF'
+      background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 14px 36px rgba(0,114,255,0.55)'
     }
   },
-  learnMore: { color: theme.palette.common.white },
-  buttonIcon: { marginLeft: theme.spacing(2) },
+  learnMore: { color: '#fff' },
+  buttonIcon: { marginLeft: theme.spacing(1.5) },
   [theme.breakpoints.down('sm')]: {
     infoSection: {
       background:
-        'linear-gradient(to right, rgba(0,0,0,.9) 70%, transparent 100%)'
+        'linear-gradient(to top, #070a10 2%, rgba(7,10,16,0.2) 45%, rgba(7,10,16,0) 75%), ' +
+        'linear-gradient(to right, rgba(7,10,16,0.95) 55%, rgba(7,10,16,0.4) 100%)'
     },
-    movieHeader: { maxWidth: '90%' },
+    movieHeader: { maxWidth: '92%', padding: theme.spacing(2) },
     movieTitle: {
       maxWidth: '100%',
-      fontSize: '16px'
+      fontSize: '1.9rem'
     },
     descriptionText: {
       maxWidth: '100%',
-      fontSize: '12px'
+      fontSize: '0.9rem'
     },
-    tag: { padding: theme.spacing(0.3, 1), margin: theme.spacing(1, 1, 1, 0) },
-    movieActions: { display: 'flex', width: '100%' },
+    tag: { padding: theme.spacing(0.3, 1.2), margin: theme.spacing(1, 1, 1, 0) },
+    movieActions: {
+      left: theme.spacing(2),
+      right: theme.spacing(2),
+      bottom: theme.spacing(3)
+    },
     button: {
-      flex: 1,
-      fontSize: 13,
-      height: 'auto',
-      padding: theme.spacing(2)
-    },
-    footer: {
-      left: theme.spacing(1),
-      bottom: theme.spacing(12)
+      width: '100%',
+      height: 50,
+      fontSize: 14
     }
   }
 });

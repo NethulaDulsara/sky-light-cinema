@@ -145,7 +145,7 @@ export default function TermsAndConditionsModal({
         </List>
 
         <Typography className={classes.linkText}>
-          Please read our full terms and conditions here: <a href="https://www.skylightcinemas.com/terms-and-conditions" target="_blank" rel="noopener noreferrer" className={classes.linkHref}>https://www.skylightcinemas.com/terms-and-conditions</a>
+          Read our full <a href="/#/terms" target="_blank" rel="noopener noreferrer" className={classes.linkHref}>Terms &amp; Conditions</a> and <a href="/#/disclaimer" target="_blank" rel="noopener noreferrer" className={classes.linkHref}>Disclaimer</a>.
         </Typography>
 
         <Box className={classes.agreeButtonWrapper}>

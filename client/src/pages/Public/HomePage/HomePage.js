@@ -9,7 +9,7 @@ import {
   getCinemas
 } from '../../../store/actions';
 import MovieCarousel from '../components/MovieCarousel/MovieCarousel';
-import MovieBanner from '../components/MovieBanner/MovieBanner';
+import HeroBanner from '../components/HeroBanner/HeroBanner';
 import Experiences from '../components/Experiences/Experiences';
 import Offers from '../components/Offers/Offers';
 import Slider from 'react-slick';
@@ -18,6 +18,8 @@ import 'slick-carousel/slick/slick-theme.css';
 import styles from './styles';
 
 class HomePage extends Component {
+  state = { heroIds: [] };
+
   componentDidMount() {
     const {
       movies,
@@ -36,6 +38,11 @@ class HomePage extends Component {
     if (user) {
       if (!suggested.length) getMovieSuggestion(user.username);
     }
+    // Admin-chosen featured movies for the hero slider.
+    fetch('/settings')
+      .then(res => res.json())
+      .then(data => this.setState({ heroIds: data.heroMovieIds || [] }))
+      .catch(() => {});
   }
 
   componentDidUpdate(prevProps) {
@@ -67,13 +74,19 @@ class HomePage extends Component {
       arrows: false
     };
 
+    const { heroIds } = this.state;
+    const heroMovies =
+      heroIds && heroIds.length
+        ? heroIds.map(id => movies.find(m => m._id === id)).filter(Boolean)
+        : movies;
+
     return (
       <Fragment>
-        {movies && movies.length > 0 && (
+        {heroMovies && heroMovies.length > 0 && (
           <Slider {...bannerSettings}>
-            {movies.map(movie => (
+            {heroMovies.map(movie => (
               <div key={movie._id}>
-                <MovieBanner movie={movie} height="85vh" />
+                <HeroBanner movie={movie} height="85vh" />
               </div>
             ))}
           </Slider>
@@ -93,6 +106,8 @@ class HomePage extends Component {
           title="Coming Soon"
           to="/movie/category/comingSoon"
           movies={comingSoon}
+          autoplay={true}
+          autoplaySpeed={3500}
         />
         {cinemas && cinemas.length > 0 && (
           <div className={classes.cinemaSection}>

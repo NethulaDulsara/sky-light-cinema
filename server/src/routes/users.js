@@ -36,7 +36,23 @@ router.post('/users/photo/:id', upload('users').single('file'), async (req, res,
     res.send({ user, file });
   } catch (e) {
     console.log(e);
-    res.sendStatus(400).send(e);
+    res.status(400).send(e);
+  }
+});
+
+// Create a staff account (cashier) — superadmin only. The public POST /users
+// route forbids setting a role, so staff are provisioned here instead.
+router.post('/users/staff', auth.enhance, async (req, res) => {
+  try {
+    const { name, username, email, phone, password, role = 'cashier' } = req.body;
+    if (!['cashier', 'admin'].includes(role)) {
+      return res.status(400).send({ error: 'Staff role must be cashier or admin.' });
+    }
+    const user = new User({ name, username, email, phone, password, role });
+    await user.save();
+    res.status(201).send({ user });
+  } catch (e) {
+    res.status(400).send({ error: e.message || 'Could not create staff account.' });
   }
 });
 
@@ -54,52 +70,52 @@ router.post('/users/login', async (req, res) => {
 });
 
 router.post('/users/login/facebook', async (req, res) => {
-  const { email, userID, name } = req.body;
-  const nameArray = name.split(' ');
+  try {
+    const { email, userID, name } = req.body;
+    if (!name || !userID) throw new Error('Missing Facebook profile data');
+    const nameArray = name.split(' ');
 
-  const user = await User.findOne({ facebook: userID });
-  if (!user) {
-    const newUser = new User({
-      name,
-      username: nameArray.join('') + userID,
-      email,
-      facebook: userID,
-    });
-    try {
+    const user = await User.findOne({ facebook: userID });
+    if (!user) {
+      const newUser = new User({
+        name,
+        username: nameArray.join('') + userID,
+        email,
+        facebook: userID,
+      });
       await newUser.save();
       const token = await newUser.generateAuthToken();
-      res.status(201).send({ user: newUser, token });
-    } catch (e) {
-      res.status(400).send(e);
+      return res.status(201).send({ user: newUser, token });
     }
-  } else {
     const token = await user.generateAuthToken();
-    res.send({ user, token });
+    return res.send({ user, token });
+  } catch (e) {
+    return res.status(400).send(e);
   }
 });
 
 router.post('/users/login/google', async (req, res) => {
-  const { email, googleId, name } = req.body;
-  const nameArray = name.split(' ');
+  try {
+    const { email, googleId, name } = req.body;
+    if (!name || !googleId) throw new Error('Missing Google profile data');
+    const nameArray = name.split(' ');
 
-  const user = await User.findOne({ google: googleId });
-  if (!user) {
-    const newUser = new User({
-      name,
-      username: nameArray.join('') + googleId,
-      email,
-      google: googleId,
-    });
-    try {
+    const user = await User.findOne({ google: googleId });
+    if (!user) {
+      const newUser = new User({
+        name,
+        username: nameArray.join('') + googleId,
+        email,
+        google: googleId,
+      });
       await newUser.save();
       const token = await newUser.generateAuthToken();
-      res.status(201).send({ user: newUser, token });
-    } catch (e) {
-      res.status(400).send(e);
+      return res.status(201).send({ user: newUser, token });
     }
-  } else {
     const token = await user.generateAuthToken();
-    res.send({ user, token });
+    return res.send({ user, token });
+  } catch (e) {
+    return res.status(400).send(e);
   }
 });
 
@@ -168,7 +184,6 @@ router.get('/users/:id', auth.enhance, async (req, res) => {
 
 // Edit/Update user
 router.patch('/users/me', auth.simple, async (req, res) => {
-  console.log(req.body);
   const updates = Object.keys(req.body);
   const allowedUpdates = ['name', 'phone', 'username', 'email', 'password'];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
@@ -200,10 +215,9 @@ router.patch('/users/:id', auth.enhance, async (req, res) => {
 
   try {
     const user = await User.findById(_id);
+    if (!user) return res.sendStatus(404);
     updates.forEach((update) => (user[update] = req.body[update]));
     await user.save();
-
-    if (!user) return res.sendStatus(404);
     res.send(user);
   } catch (e) {
     res.status(400).send(e);
@@ -229,9 +243,11 @@ router.delete('/users/:id', auth.enhance, async (req, res) => {
 });
 
 router.delete('/users/me', auth.simple, async (req, res) => {
-  if (req.user.role !== 'superadmin')
+  // A super admin is the application owner and cannot delete their own account
+  // (it would orphan the system); any other user may delete their own account.
+  if (req.user.role === 'superadmin')
     return res.status(400).send({
-      error: 'You cannot delete yourself!',
+      error: 'The super admin account cannot be self-deleted.',
     });
   try {
     await req.user.remove();

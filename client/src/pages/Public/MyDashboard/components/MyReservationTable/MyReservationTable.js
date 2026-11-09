@@ -8,11 +8,22 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TablePagination
+  TablePagination,
+  Button,
+  Chip
 } from '@material-ui/core';
 
 import { Portlet, PortletContent } from '../../../../../components';
 import styles from './styles';
+
+const statusColor = {
+  paid: { background: '#e6f4ea', color: '#137333' },
+  pending: { background: '#fef7e0', color: '#8a6d00' },
+  refunded: { background: '#e8eaf6', color: '#3730a3' },
+  cancelled: { background: '#fce8e6', color: '#b3261e' },
+  failed: { background: '#fce8e6', color: '#b3261e' },
+  expired: { background: '#eceff1', color: '#555' }
+};
 
 class ReservationsTable extends Component {
   state = {
@@ -27,7 +38,8 @@ class ReservationsTable extends Component {
     onShowDetails: PropTypes.func,
     reservations: PropTypes.array.isRequired,
     movies: PropTypes.array.isRequired,
-    cinemas: PropTypes.array.isRequired
+    cinemas: PropTypes.array.isRequired,
+    onCancel: PropTypes.func
   };
 
   static defaultProps = {
@@ -51,8 +63,16 @@ class ReservationsTable extends Component {
     return item ? item[attr] : `Not ${attr} Found`;
   };
 
+  canCancel = reservation => {
+    if (['cancelled', 'refunded', 'expired', 'failed'].includes(reservation.paymentStatus)) {
+      return false;
+    }
+    // Only future showtimes can be cancelled.
+    return new Date(reservation.date).getTime() > Date.now();
+  };
+
   render() {
-    const { classes, className, reservations, movies, cinemas } = this.props;
+    const { classes, className, reservations, movies, cinemas, onCancel } = this.props;
     const { rowsPerPage, page } = this.state;
     const rootClassName = classNames(classes.root, className);
 
@@ -68,6 +88,8 @@ class ReservationsTable extends Component {
                 <TableCell align="left">Start At</TableCell>
                 <TableCell align="left">Ticket Price</TableCell>
                 <TableCell align="left">Total</TableCell>
+                <TableCell align="left">Status</TableCell>
+                <TableCell align="left">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -95,6 +117,26 @@ class ReservationsTable extends Component {
                     </TableCell>
                     <TableCell className={classes.tableCell}>
                       {reservation.total}
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      <Chip
+                        label={(reservation.paymentStatus || 'pending').toUpperCase()}
+                        size="small"
+                        style={statusColor[reservation.paymentStatus] || statusColor.pending}
+                      />
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {this.canCancel(reservation) ? (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => onCancel && onCancel(reservation)}>
+                          Cancel
+                        </Button>
+                      ) : (
+                        <span style={{ opacity: 0.5 }}>—</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

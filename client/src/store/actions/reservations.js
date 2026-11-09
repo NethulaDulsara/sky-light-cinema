@@ -20,6 +20,23 @@ export const getReservations = () => async dispatch => {
   }
 };
 
+// Fetch only the signed-in user's own reservations (for My Dashboard).
+export const getMyReservations = () => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const response = await fetch('/reservations/mine', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (response.ok) {
+      const reservations = await response.json();
+      dispatch({ type: GET_RESERVATIONS, payload: reservations });
+    }
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+  }
+};
+
 export const getSuggestedReservationSeats = username => async dispatch => {
   try {
     const token = localStorage.getItem('jwtToken');
@@ -63,6 +80,12 @@ export const addReservation = reservation => async dispatch => {
         data: { reservation, QRCode }
       };
     }
+    // Non-OK (e.g. 409 seat conflict): surface the server message.
+    const errBody = await response.json().catch(() => ({}));
+    return {
+      status: 'error',
+      message: errBody.error || 'Reservation could not be created, try again.'
+    };
   } catch (error) {
     dispatch(setAlert(error.message, 'error', 5000));
     return {
@@ -94,6 +117,31 @@ export const updateReservation = (reservation, id) => async dispatch => {
       status: 'error',
       message: ' Reservation have not been updated, try again.'
     };
+  }
+};
+
+// Cancel (and refund where eligible) a reservation.
+export const cancelReservation = id => async dispatch => {
+  try {
+    const token = localStorage.getItem('jwtToken');
+    const response = await fetch('/reservations/' + id + '/cancel', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      dispatch(setAlert(data.message || 'Booking cancelled.', 'success', 6000));
+      dispatch(getReservations());
+      return { status: 'success', ...data };
+    }
+    dispatch(setAlert(data.error || 'Could not cancel booking.', 'error', 5000));
+    return { status: 'error', message: data.error };
+  } catch (error) {
+    dispatch(setAlert(error.message, 'error', 5000));
+    return { status: 'error', message: error.message };
   }
 };
 

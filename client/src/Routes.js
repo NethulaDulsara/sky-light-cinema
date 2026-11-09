@@ -2,9 +2,10 @@ import React, { lazy, Suspense } from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 
 import Loading from './components/Loading';
-import { ProtectedRoute, WithLayoutRoute } from './routers';
+import ScrollToTop from './components/ScrollToTop';
+import { ProtectedRoute, WithLayoutRoute, StaffRoute } from './routers';
 
-import { AdminLayout, PublicLayout } from './layouts';
+import { AdminLayout, PublicLayout, POSLayout } from './layouts';
 
 // Admin
 const DashboardPage = lazy(() => import('./pages/Admin/Dashboard'));
@@ -14,6 +15,13 @@ const ShowtimeList = lazy(() => import('./pages/Admin/ShowtimeList'));
 const ReservationList = lazy(() => import('./pages/Admin/ReservationList'));
 const User = lazy(() => import('./pages/Admin/User'));
 const Account = lazy(() => import('./pages/Admin/Account'));
+const AdminSettings = lazy(() => import('./pages/Admin/Settings'));
+const AdminNotifyRequests = lazy(() => import('./pages/Admin/NotifyRequests'));
+const AdminReports = lazy(() => import('./pages/Admin/Reports'));
+const AdminCashiers = lazy(() => import('./pages/Admin/Cashiers'));
+
+// Box office (POS) — staff-only
+const POSPage = lazy(() => import('./pages/POS'));
 
 // Register - Login
 const Register = lazy(() => import('./pages/Public/Register'));
@@ -27,8 +35,13 @@ const MovieCategoryPage = lazy(() =>
   import('./pages/Public/MovieCategoryPage')
 );
 const CinemasPage = lazy(() => import('./pages/Public/CinemasPage'));
+const SearchPage = lazy(() => import('./pages/Public/SearchPage'));
+const PrivacyPolicy = lazy(() => import('./pages/Public/PrivacyPolicy'));
+const TermsConditions = lazy(() => import('./pages/Public/TermsConditions'));
+const Disclaimer = lazy(() => import('./pages/Public/Disclaimer'));
 const BookingPage = lazy(() => import('./pages/Public/BookingPage'));
 const PaymentPage = lazy(() => import('./pages/Public/PaymentPage'));
+const InfoPage = lazy(() => import('./pages/Public/InfoPage'));
 
 const Checkin = lazy(() => import('./pages/Public/Checkin'));
 
@@ -36,6 +49,7 @@ const Routes = () => {
   return (
     <Suspense fallback={<Loading />}>
       <Router>
+        <ScrollToTop />
         <Switch>
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
@@ -67,6 +81,44 @@ const Routes = () => {
           />
           <WithLayoutRoute
             exact
+            path="/search"
+            layout={PublicLayout}
+            component={SearchPage}
+          />
+          <WithLayoutRoute
+            exact
+            path="/privacy"
+            layout={PublicLayout}
+            component={PrivacyPolicy}
+          />
+          <WithLayoutRoute
+            exact
+            path="/terms"
+            layout={PublicLayout}
+            component={TermsConditions}
+          />
+          <WithLayoutRoute
+            exact
+            path="/disclaimer"
+            layout={PublicLayout}
+            component={Disclaimer}
+          />
+          <WithLayoutRoute
+            exact
+            path={[
+              '/about',
+              '/experiences',
+              '/offers',
+              '/privilege',
+              '/careers',
+              '/advertise',
+              '/contact'
+            ]}
+            layout={PublicLayout}
+            component={InfoPage}
+          />
+          <WithLayoutRoute
+            exact
             path="/movie/category/:category"
             layout={PublicLayout}
             component={MovieCategoryPage}
@@ -91,6 +143,12 @@ const Routes = () => {
             layout={PublicLayout}
             layoutProps={{ withFooter: false }}
             component={PaymentPage}
+          />
+          <StaffRoute
+            exact
+            path="/pos"
+            layout={POSLayout}
+            component={POSPage}
           />
           <ProtectedRoute
             exact
@@ -133,6 +191,30 @@ const Routes = () => {
             path="/admin/account"
             layout={AdminLayout}
             component={Account}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/settings"
+            layout={AdminLayout}
+            component={AdminSettings}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/notify"
+            layout={AdminLayout}
+            component={AdminNotifyRequests}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/reports"
+            layout={AdminLayout}
+            component={AdminReports}
+          />
+          <ProtectedRoute
+            exact
+            path="/admin/cashiers"
+            layout={AdminLayout}
+            component={AdminCashiers}
           />
           <Route path="*" component={() => '404 NOT FOUND'} />
         </Switch>

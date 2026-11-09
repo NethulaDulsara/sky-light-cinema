@@ -15,6 +15,17 @@ const showtimeSchema = new Schema({
     type: Date,
     required: true,
   },
+  // Screen format for this showtime (2D/3D/IMAX/4DX). Drives price multiplier.
+  format: {
+    type: String,
+    default: '2D',
+    trim: true,
+  },
+  // Per-screening frozen seats ("rowIndex-colIndex"), on top of the hall's.
+  frozenSeats: {
+    type: [String],
+    default: [],
+  },
   movieId: {
     type: Schema.Types.ObjectId,
     ref: 'Movie',
