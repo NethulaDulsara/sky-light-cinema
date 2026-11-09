@@ -22,10 +22,8 @@ router.post(
   auth.enhance,
   upload('movies').single('file'),
   async (req, res, next) => {
-    console.log('in here');
     const { file } = req;
     const movieId = req.params.id;
-    console.log('check movie id', movieId);
     try {
       if (!file) {
         const error = new Error('Please upload a file');
@@ -33,9 +31,6 @@ router.post(
         return next(error);
       }
       const movie = await Movie.findById(movieId);
-
-      console.log('check new', movie);
-
       if (!movie) return res.sendStatus(404);
       movie.image = `/uploads/movies/${file.filename}`;
       await movie.save();
@@ -47,10 +42,16 @@ router.post(
   }
 );
 
-// Get all movies
+// Get all movies, with optional search/filter query params:
+//   ?search=<title substring>&genre=<g>&language=<l>
 router.get('/movies', async (req, res) => {
   try {
-    const movies = await Movie.find({});
+    const { search, genre, language } = req.query;
+    const query = {};
+    if (search) query.title = { $regex: search, $options: 'i' };
+    if (genre) query.genre = { $regex: genre, $options: 'i' };
+    if (language) query.language = { $regex: `^${language}$`, $options: 'i' };
+    const movies = await Movie.find(query);
     res.send(movies);
   } catch (e) {
     res.status(400).send(e);
@@ -85,6 +86,12 @@ router.put('/movies/:id', auth.enhance, async (req, res) => {
     'duration',
     'releaseDate',
     'endDate',
+    'trailerUrl',
+    'certification',
+    'imdbRating',
+    'country',
+    'backdropImage',
+    'gallery',
   ];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 

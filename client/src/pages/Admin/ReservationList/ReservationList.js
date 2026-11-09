@@ -4,7 +4,12 @@ import { connect } from 'react-redux';
 import { withStyles, CircularProgress } from '@material-ui/core';
 import styles from './styles';
 import { ReservationsToolbar, ReservationsTable } from './components';
-import { getReservations, getMovies, getCinemas } from '../../../store/actions';
+import {
+  getReservations,
+  getMovies,
+  getCinemas,
+  cancelReservation
+} from '../../../store/actions';
 import ReservationsCalendar from './components/ReservationsCalendar/ReservationsCalendar';
 import { match } from '../../../utils';
 
@@ -36,6 +41,14 @@ class ReservationList extends Component {
 
   onChangeSearch = e => this.setState({ search: e.target.value });
 
+  onCancel = reservation => {
+    const msg =
+      reservation.paymentStatus === 'paid'
+        ? 'Cancel and refund this booking (if within policy)?'
+        : 'Cancel this booking?';
+    if (window.confirm(msg)) this.props.cancelReservation(reservation._id);
+  };
+
   render() {
     const { mode, search } = this.state;
     const { classes, reservations, movies, cinemas } = this.props;
@@ -61,6 +74,7 @@ class ReservationList extends Component {
               reservations={filteredReservations}
               movies={movies}
               cinemas={cinemas}
+              onCancel={this.onCancel}
             />
           ) : (
             <ReservationsCalendar
@@ -84,7 +98,8 @@ const mapStateToProps = ({ reservationState, movieState, cinemaState }) => ({
 const mapDispatchToProps = {
   getReservations,
   getMovies,
-  getCinemas
+  getCinemas,
+  cancelReservation
 };
 export default connect(
   mapStateToProps,

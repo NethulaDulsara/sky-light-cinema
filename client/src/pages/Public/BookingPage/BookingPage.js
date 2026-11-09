@@ -24,6 +24,7 @@ import {
   setQRCode
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
+import { getSessionId } from '../../../utils';
 import LoginForm from '../Login/components/LoginForm';
 import styles from './styles';
 import MovieInfo from './components/MovieInfo/MovieInfo';
@@ -42,10 +43,14 @@ class BookingPage extends Component {
     ticketCount: 1,
     isTicketTypeModalOpen: false,
     isTermsModalOpen: false,
-    pendingCheckout: null
+    pendingCheckout: null,
+    // "row-col" keys that are unavailable (booked or held by other sessions)
+    takenSeats: []
   };
 
   didSetSuggestion = false;
+  sessionId = getSessionId();
+  seatPollTimer = null;
 
   componentDidMount() {
     const {
@@ -66,14 +71,111 @@ class BookingPage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { selectedCinema, selectedDate, getCinema } = this.props;
+    const { selectedCinema, selectedDate, selectedTime, getCinema } = this.props;
     if (
       (selectedCinema && prevProps.selectedCinema !== selectedCinema) ||
       (selectedCinema && prevProps.selectedDate !== selectedDate)
     ) {
       getCinema(selectedCinema);
     }
+    // Refresh seat availability whenever the chosen showtime changes.
+    if (
+      selectedCinema &&
+      selectedTime &&
+      (prevProps.selectedCinema !== selectedCinema ||
+        prevProps.selectedTime !== selectedTime ||
+        prevProps.selectedDate !== selectedDate)
+    ) {
+      this.refreshSeatAvailability();
+      this.startSeatPolling();
+    }
   }
+
+  componentWillUnmount() {
+    this.stopSeatPolling();
+    this.releaseSeatLocks();
+  }
+
+  // Resolve the showtime document for the current cinema + time selection.
+  getCurrentShowtime = () => {
+    const { showtimes, selectedCinema, selectedTime } = this.props;
+    if (!showtimes || !selectedCinema || !selectedTime) return null;
+    return showtimes.find(
+      s => s.cinemaId === selectedCinema && s.startAt === selectedTime
+    );
+  };
+
+  startSeatPolling = () => {
+    this.stopSeatPolling();
+    this.seatPollTimer = setInterval(this.refreshSeatAvailability, 8000);
+  };
+
+  stopSeatPolling = () => {
+    if (this.seatPollTimer) {
+      clearInterval(this.seatPollTimer);
+      this.seatPollTimer = null;
+    }
+  };
+
+  // Fetch booked + other-session-held seats for the current showtime.
+  refreshSeatAvailability = async () => {
+    const showtime = this.getCurrentShowtime();
+    if (!showtime) return;
+    try {
+      const res = await fetch(`/showtimes/${showtime._id}/seats`);
+      if (!res.ok) return;
+      const { booked = [], held = [] } = await res.json();
+      const keys = new Set();
+      booked.forEach(s => keys.add(`${s[0]}-${s[1]}`));
+      held
+        .filter(h => h.sessionId !== this.sessionId)
+        .forEach(h => keys.add(h.seat));
+      this.setState({ takenSeats: Array.from(keys) });
+    } catch (e) {
+      /* non-fatal: keep last known availability */
+    }
+  };
+
+  // Hold the currently selected seats for this browser session.
+  syncSeatLocks = async seats => {
+    const showtime = this.getCurrentShowtime();
+    if (!showtime || !seats || !seats.length) return true;
+    try {
+      const res = await fetch('/seatlocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          showtimeId: showtime._id,
+          sessionId: this.sessionId,
+          seats
+        })
+      });
+      if (res.status === 409) {
+        this.props.setAlert('Some of those seats were just taken. Please choose again.', 'error', 4000);
+        this.refreshSeatAvailability();
+        return false;
+      }
+      return res.ok;
+    } catch (e) {
+      return true; // best effort
+    }
+  };
+
+  releaseSeatLocks = () => {
+    const showtime = this.getCurrentShowtime();
+    if (!showtime) return;
+    // Fire-and-forget; keepalive lets it run during navigation/unload.
+    try {
+      fetch('/seatlocks', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showtimeId: showtime._id, sessionId: this.sessionId }),
+        keepalive: true
+      });
+    } catch (e) {
+      /* ignore */
+    }
+  };
 
   onShowSeatSelection = (ticketCount) => {
     this.setState({ isSeatSelectionVisible: true, ticketCount });
@@ -117,12 +219,36 @@ class BookingPage extends Component {
     // Check if the seat is currently selected
     const isSelected = currentSelected.some(s => s[0] === row && s[1] === seat);
 
-    // If it's not selected and we've reached the ticket limit, do nothing
+    // At the ticket limit and clicking a new (unselected) seat:
     if (!isSelected && currentSelected.length >= ticketCount) {
-      return; 
+      // For a single ticket, MOVE the selection to the newly clicked seat
+      // (deselect the old one, select the new one) instead of doing nothing.
+      if (ticketCount === 1 && currentSelected.length === 1) {
+        setSelectedSeats(currentSelected[0]); // remove previous seat
+        setSelectedSeats([row, seat]); // select the new seat
+        this.syncSeatLocks([[row, seat]]);
+        return;
+      }
+      // For multiple tickets, prompt the user to free a seat first.
+      this.props.setAlert(
+        `You have selected all ${ticketCount} seats. Click a green seat to deselect it before choosing another.`,
+        'info',
+        3500
+      );
+      return;
     }
 
     setSelectedSeats([row, seat]);
+
+    // Compute the resulting selection and hold those seats for this session.
+    const newSelection = isSelected
+      ? currentSelected.filter(s => !(s[0] === row && s[1] === seat))
+      : [...currentSelected, [row, seat]];
+    if (newSelection.length) {
+      this.syncSeatLocks(newSelection);
+    } else {
+      this.releaseSeatLocks();
+    }
   };
 
   onOpenTicketTypeModal = () => {
@@ -155,6 +281,7 @@ class BookingPage extends Component {
 
   async checkout(adultCount, childCount) {
     const {
+      user,
       movie,
       cinema,
       cinemas,
@@ -164,49 +291,70 @@ class BookingPage extends Component {
       selectedTime,
       getReservations,
       addReservation,
-      setQRCode
+      setQRCode,
+      setAlert
     } = this.props;
 
     const currentCinema = cinema || (cinemas && cinemas.find(c => c._id === selectedCinema));
 
     if (!selectedSeats || selectedSeats.length === 0) return;
 
-    const adultPrice = currentCinema ? (currentCinema.ticketPrice || 1500) : 1500;
-    const childPrice = adultPrice - 100;
-    const totalPrice = (adultCount * adultPrice) + (childCount * childPrice);
+    const showtime = this.getCurrentShowtime();
+    const format = showtime ? showtime.format || '2D' : '2D';
 
     this.setState({ isTicketTypeModalOpen: false });
 
+    // The server computes the authoritative price (base + format + dynamic
+    // pricing + fees + VAT). Client amounts are not trusted.
     const response = await addReservation({
       date: selectedDate,
       startAt: selectedTime,
       seats: this.bookSeats(),
-      ticketPrice: adultPrice,
-      total: totalPrice,
+      format,
+      showtimeId: showtime ? showtime._id : undefined,
+      sessionId: this.sessionId,
       movieId: movie ? movie._id : '',
       cinemaId: currentCinema ? currentCinema._id : selectedCinema,
-      username: 'Guest',
-      email: 'guest@example.com',
-      phone: '0000000000'
+      // Associate the booking with the signed-in account (if any) so it appears
+      // in their dashboard; guests remain anonymous.
+      userId: user ? user._id : undefined,
+      username: user ? user.name : 'Guest',
+      email: user ? user.email : undefined,
+      phone: user ? (user.phone || '0000000000') : '0000000000'
     });
     if (response && response.status === 'success') {
       const { data } = response;
+      const r = data.reservation;
       setQRCode(data.QRCode);
       getReservations();
-      
+      // Seats are now held by the pending reservation; drop the session locks.
+      this.releaseSeatLocks();
+      this.stopSeatPolling();
+
       this.props.history.push({
-        pathname: '/payment/' + data.reservation._id,
+        pathname: '/payment/' + r._id,
         state: {
           movieTitle: movie ? movie.title : '',
           cinemaName: currentCinema ? currentCinema.name : '',
           date: selectedDate,
           time: selectedTime,
+          format,
           seats: this.bookSeats(),
-          totalPrice,
+          totalPrice: r.total,
+          breakdown: {
+            subtotal: r.subtotal,
+            convenienceFee: r.convenienceFee,
+            vat: r.vat,
+            total: r.total
+          },
+          holdExpiresAt: r.holdExpiresAt,
           adultCount,
           childCount
         }
       });
+    } else if (response && response.status === 'error') {
+      setAlert(response.message || 'Could not create booking. Please try again.', 'error', 5000);
+      this.refreshSeatAvailability();
     }
   }
 
@@ -248,7 +396,7 @@ class BookingPage extends Component {
   }
 
   onGetReservedSeats = () => {
-    const { reservations, cinema, cinemas, selectedCinema, selectedDate, selectedTime } = this.props;
+    const { cinema, cinemas, selectedCinema } = this.props;
     const currentCinema = cinema || (cinemas && cinemas.find(c => c._id === selectedCinema));
 
     let newSeats = currentCinema && currentCinema.seats && currentCinema.seats.length
@@ -260,33 +408,32 @@ class BookingPage extends Component {
       newSeats = Array.from({ length: 10 }, () => Array(10).fill(0));
     }
 
-    if (!selectedDate || !selectedTime || !reservations || !reservations.length) {
-      return newSeats;
-    }
-
-    const filteredReservations = reservations.filter(
-      reservation =>
-        reservation &&
-        reservation.date &&
-        new Date(reservation.date).toLocaleDateString() ===
-          new Date(selectedDate).toLocaleDateString() &&
-        reservation.startAt === selectedTime
-    );
-
-    if (filteredReservations.length) {
-      const reservedSeats = filteredReservations
-        .map(reservation => (Array.isArray(reservation.seats) ? reservation.seats : []))
-        .reduce((a, b) => a.concat(b), []);
-
-      reservedSeats.forEach(coord => {
-        if (Array.isArray(coord) && coord.length >= 2) {
-          const [row, seat] = coord;
-          if (newSeats[row] && newSeats[row][seat] !== undefined) {
-            newSeats[row][seat] = 1;
-          }
+    // Mark seats that are booked or held by other sessions (scoped to THIS
+    // showtime via the server availability endpoint — fixes the old bug where
+    // seats from a different movie/cinema at the same time appeared taken).
+    const { takenSeats } = this.state;
+    if (takenSeats && takenSeats.length) {
+      takenSeats.forEach(key => {
+        const [row, seat] = key.split('-').map(Number);
+        if (newSeats[row] && newSeats[row][seat] !== undefined) {
+          newSeats[row][seat] = 1;
         }
       });
     }
+
+    // Admin-frozen seats: hall-level (cinema) + per-showtime, shown as blocked.
+    const showtime = this.getCurrentShowtime();
+    const frozen = [
+      ...((currentCinema && currentCinema.frozenSeats) || []),
+      ...((showtime && showtime.frozenSeats) || [])
+    ];
+    frozen.forEach(key => {
+      const [row, seat] = key.split('-').map(Number);
+      if (newSeats[row] && newSeats[row][seat] !== undefined && newSeats[row][seat] !== 1) {
+        newSeats[row][seat] = 4;
+      }
+    });
+
     return newSeats;
   };
 

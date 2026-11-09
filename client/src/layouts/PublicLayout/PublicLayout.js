@@ -1,6 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
 import { Navbar, Footer } from './components';
+import { CookieConsent } from '../../components';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -18,6 +19,7 @@ function PublicLayout(props) {
       <Navbar />
       {children}
       {withFooter && <Footer />}
+      <CookieConsent />
     </div>
   );
 }

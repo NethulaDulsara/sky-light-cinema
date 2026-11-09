@@ -1,44 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Typography, Button } from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
 import Slider from 'react-slick';
 import useStyles from './styles';
 
-const offersData = [
-  {
-    id: 1,
-    title: 'ENJOY 10% OFF SLUSHIES',
-    image: 'https://images.unsplash.com/photo-1572490122747-3968b75bb8ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 2,
-    title: '20% OFF ON MOVIE TICKETS',
-    image: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 3,
-    title: 'BUY ONE GET ONE FREE ON IMAX TICKETS',
-    image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 4,
-    title: 'EARN 5% LOYALTY POINTS',
-    image: 'https://images.unsplash.com/photo-1518623489648-a173ef7824f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-  }
-];
-
 const Offers = () => {
   const classes = useStyles();
+  const [offers, setOffers] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (!active) return;
+        const list = (data.offers || []).filter(o => o.enabled !== false);
+        setOffers(list);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (!offers.length) return null;
 
   const settings = {
     dots: false,
-    infinite: true,
+    infinite: offers.length > 3,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: Math.min(3, offers.length),
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 2 } },
+      { breakpoint: 1024, settings: { slidesToShow: Math.min(2, offers.length) } },
       { breakpoint: 600, settings: { slidesToShow: 1 } }
     ]
   };
@@ -46,23 +42,38 @@ const Offers = () => {
   return (
     <div className={classes.container}>
       <Typography variant="h4" className={classes.header}>
-        Offers & Giveaways
+        Offers &amp; Giveaways
       </Typography>
       <div className={classes.sliderContainer}>
         <Slider {...settings}>
-          {offersData.map((offer) => (
-            <div key={offer.id}>
+          {offers.map((offer, index) => (
+            <div key={index}>
               <div className={classes.offerCard}>
                 <div
                   className={classes.imagePlaceholder}
                   style={{ backgroundImage: `url(${offer.image})` }}
                 >
+                  {offer.badge ? (
+                    <span className={classes.badge}>{offer.badge}</span>
+                  ) : null}
                   <Typography variant="h5" className={classes.offerText}>
                     {offer.title}
                   </Typography>
                 </div>
-                <Button variant="contained" className={classes.exploreButton}>
-                  EXPLORE MORE
+                {offer.description ? (
+                  <div className={classes.offerBody}>
+                    <Typography className={classes.offerDescription}>
+                      {offer.description}
+                    </Typography>
+                  </div>
+                ) : null}
+                <Button
+                  variant="contained"
+                  className={classes.exploreButton}
+                  component={RouterLink}
+                  to={offer.ctaLink || '/movie/category/nowShowing'}
+                >
+                  {offer.ctaLabel || 'Explore More'}
                 </Button>
               </div>
             </div>

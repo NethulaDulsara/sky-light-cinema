@@ -89,10 +89,7 @@ class ShowtimesTable extends Component {
             </TableHead>
             <TableBody>
               {showtimes
-                .filter(showtime => {
-                  return showtime;
-                })
-                .slice(0, rowsPerPage)
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map(showtime => (
                   <TableRow
                     className={classes.tableRow}

@@ -22,6 +22,11 @@ const cinemaSchema = new Schema({
     type: [Schema.Types.Mixed],
     required: true,
   },
+  // Hall-level frozen seats ("rowIndex-colIndex"), blocked on every showtime.
+  frozenSeats: {
+    type: [String],
+    default: [],
+  },
   seatsAvailable: {
     type: Number,
     required: true,

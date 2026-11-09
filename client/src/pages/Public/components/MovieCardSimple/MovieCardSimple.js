@@ -1,93 +1,217 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
+import { Typography, Button, IconButton } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import ConfirmationNumberIcon from '@material-ui/icons/ConfirmationNumber';
+import { getPosterUrl, onPosterError } from '../../../../utils/poster';
+import { youTubeId } from '../../../../utils/youtube';
+import NotifyButton from '../NotifyButton/NotifyButton';
 
 const useStyles = makeStyles(theme => ({
+  wrapper: { padding: theme.spacing(0, 1), textAlign: 'center' },
   card: {
-    maxWidth: 400,
-    margin: '0 auto',
-    backgroundColor: '#1a1a3a',
-    borderRadius: 12,
-    color: theme.palette.common.white,
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
-    transition: 'transform 0.2s',
+    position: 'relative',
+    borderRadius: 14,
+    overflow: 'hidden',
+    backgroundColor: '#0c1022',
+    boxShadow: '0 10px 28px rgba(0,0,0,0.45)',
+    '&:hover $poster': { filter: 'blur(3px) brightness(0.4)', transform: 'scale(1.05)' },
+    '&:hover $overlay': { opacity: 1 }
+  },
+  posterWrap: {
+    position: 'relative',
+    width: '100%',
+    paddingTop: '150%',
+    overflow: 'hidden'
+  },
+  poster: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+    objectPosition: 'center',
+    transition: 'filter .35s ease, transform .35s ease'
+  },
+  overlay: {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing(1.5),
+    opacity: 0,
+    transition: 'opacity .3s ease',
+    background: 'rgba(5,7,12,0.35)'
+  },
+  playBtn: {
+    color: '#fff',
+    border: '2px solid rgba(255,255,255,0.85)',
+    background: 'rgba(0,0,0,0.25)',
+    width: 62,
+    height: 62,
+    transition: 'transform .2s ease, background .2s ease, border-color .2s ease',
     '&:hover': {
-      transform: 'translateY(-5px)',
-      boxShadow: '0 12px 30px rgba(0, 229, 255, 0.4)'
+      transform: 'scale(1.1)',
+      borderColor: '#00C6FF',
+      background: 'rgba(0,198,255,0.2)'
     }
   },
-  media: {
-    height: 400,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    borderRadius: '12px 12px 0 0'
+  watchLabel: {
+    color: '#fff',
+    fontWeight: 700,
+    fontSize: '0.95rem',
+    letterSpacing: '0.5px'
   },
-  content: {
-    padding: theme.spacing(2),
-    backgroundColor: '#1a1a3a',
-    borderTop: '2px solid rgba(255,255,255,0.1)'
+  overlayBuy: {
+    color: '#00C6FF',
+    fontWeight: 700,
+    fontSize: '0.9rem',
+    letterSpacing: '0.5px',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    '&:hover': { textDecoration: 'underline' }
   },
-  h5: {
+  title: {
+    marginTop: theme.spacing(2),
+    fontSize: '1.05rem',
+    fontWeight: 700,
+    color: '#fff',
     textTransform: 'capitalize',
-    fontWeight: 600,
-    fontSize: '1.2rem',
-    whiteSpace: 'nowrap',
+    display: '-webkit-box',
+    WebkitLineClamp: 1,
+    WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
-  }
+    '&:hover': { color: '#00C6FF' }
+  },
+  meta: {
+    marginTop: theme.spacing(0.75),
+    color: '#5bc4ff',
+    fontSize: '0.82rem',
+    fontWeight: 600,
+    letterSpacing: '0.2px'
+  },
+  buyBtn: {
+    marginTop: theme.spacing(1.5),
+    minWidth: 150,
+    borderRadius: 6,
+    padding: theme.spacing(0.9, 3),
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    color: '#fff',
+    boxShadow: '0 6px 18px rgba(0,114,255,0.35)',
+    '&:hover': { background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)' }
+  },
+  disabledBtn: {
+    marginTop: theme.spacing(1.5),
+    minWidth: 150,
+    borderRadius: 6,
+    padding: theme.spacing(0.9, 2),
+    fontWeight: 700,
+    letterSpacing: '0.5px',
+    color: 'rgba(255,255,255,0.55)',
+    backgroundColor: 'rgba(255,255,255,0.08)'
+  },
+  link: { textDecoration: 'none' }
 }));
+
+const formatDuration = mins => {
+  if (!mins) return '';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  const parts = [];
+  if (h) parts.push(`${h} HR`);
+  if (m) parts.push(`${m} MIN`);
+  return parts.join(' ');
+};
+
+const formatGenres = genre =>
+  (genre || '')
+    .split(',')
+    .map(g => g.trim())
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(g => g.charAt(0).toUpperCase() + g.slice(1))
+    .join(', ');
 
 const MovieCardSimple = props => {
   const classes = useStyles();
-  const { movie } = props;
-  const images ={eternals:'https://phantom-marca.unidadeditorial.es/927e619e34b67b9e7326c9266914e6f0/crop/68x0/1311x700/resize/1320/f/jpg/assets/multimedia/imagenes/2021/08/20/16294695683527.jpg','spider man-no way home':'https://images.indianexpress.com/2021/11/spider-man-no-way-home-new-poster-1200.jpg','avengers-infinity war':'https://pyxis.nymag.com/v1/imgs/8b3/ac6/ca28ec3072fdc00a5b59a72a75a39ab61b-20-avengers-lede.rsquare.w700.jpg','doctor strange-multiverse of madness':'https://m.media-amazon.com/images/I/818x-d2qUuL.jpg','wakanda forever':'https://thumbor.forbes.com/thumbor/fit-in/1200x0/filters%3Aformat%28jpg%29/https%3A%2F%2Fblogs-images.forbes.com%2Fscottmendelson%2Ffiles%2F2017%2F10%2FDMQuyI5V4AAUHP0.jpg'};
-  
-  const getImageUrl = (image) => {
-    let url = '';
-    if (image && image.startsWith('/uploads')) {
-      url = `http://localhost:8080${image}`;
-    } else if (image) {
-      url = image;
-    } else if (movie && movie.title && images[movie.title.toLowerCase()]) {
-      url = images[movie.title.toLowerCase()];
-    } else {
-      url = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80';
-    }
-    return encodeURI(url);
-  };
+  const { movie, onPlayTrailer, ifupcoming, hasShowtimes } = props;
+
+  const hasTrailer = Boolean(youTubeId(movie.trailerUrl));
+  const bookable = !ifupcoming && hasShowtimes !== false;
+  const bookingTo = `/movie/booking/${movie._id}`;
+
+  const metaBits = [formatDuration(movie.duration), formatGenres(movie.genre)]
+    .filter(Boolean)
+    .join(' | ');
 
   return (
-    <Link to={movie.linkUrl ? movie.linkUrl : `movie/${movie._id}`} style={{ textDecoration: 'none' }}>
-      <Card className={classes.card}>
-        <CardActionArea>
-          <CardMedia
-            className={classes.media}
-            image={getImageUrl(movie.image)}
-            title={movie.title}
+    <div className={classes.wrapper}>
+      <div className={classes.card}>
+        <div className={classes.posterWrap}>
+          <img
+            className={classes.poster}
+            src={getPosterUrl(movie.image)}
+            alt={`${movie.title} poster`}
+            onError={onPosterError}
           />
-          <CardContent className={classes.content}>
-            <Typography
-              className={classes.h5}
-              gutterBottom
-              variant="h5"
-              component="h2"
-              color="inherit">
-              {movie.title}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Link>
+          <div className={classes.overlay}>
+            {hasTrailer && (
+              <>
+                <IconButton
+                  className={classes.playBtn}
+                  aria-label={`Play ${movie.title} trailer`}
+                  onClick={() => onPlayTrailer && onPlayTrailer(movie)}>
+                  <PlayArrowIcon style={{ fontSize: 34 }} />
+                </IconButton>
+                <span className={classes.watchLabel}>Watch Trailer</span>
+              </>
+            )}
+            {bookable && (
+              <Link to={bookingTo} className={classes.overlayBuy}>
+                Buy Tickets
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Link to={`/movie/${movie._id}`} className={classes.link}>
+        <Typography className={classes.title}>{movie.title}</Typography>
+      </Link>
+      {metaBits ? <div className={classes.meta}>{metaBits}</div> : null}
+
+      {bookable ? (
+        <Button
+          className={classes.buyBtn}
+          component={Link}
+          to={bookingTo}
+          startIcon={<ConfirmationNumberIcon />}>
+          Buy Tickets
+        </Button>
+      ) : ifupcoming ? (
+        <div style={{ marginTop: 12, display: 'inline-block' }}>
+          <NotifyButton movie={movie} />
+        </div>
+      ) : (
+        <Button className={classes.disabledBtn} disabled>
+          Tickets Not Available
+        </Button>
+      )}
+    </div>
   );
 };
 
 MovieCardSimple.propTypes = {
-  movie: PropTypes.object.isRequired
+  movie: PropTypes.object.isRequired,
+  onPlayTrailer: PropTypes.func,
+  ifupcoming: PropTypes.bool,
+  hasShowtimes: PropTypes.bool
 };
+
 export default MovieCardSimple;

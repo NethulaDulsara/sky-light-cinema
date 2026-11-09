@@ -98,10 +98,10 @@ export const googleLogin = (response) => async dispatch => {
       body: JSON.stringify({ email, googleId, name })
     };
     const url = '/users/login/google';
-    const response = await fetch(url, options);
-    const responseData = await response.json();
+    const res = await fetch(url, options);
+    const responseData = await res.json();
 
-    if (response.ok) {
+    if (res.ok) {
       const { user } = responseData;
       user && setUser(user);
       dispatch({ type: LOGIN_SUCCESS, payload: responseData });
@@ -142,9 +142,9 @@ export const register = ({
       dispatch({ type: REGISTER_SUCCESS, payload: responseData });
       dispatch(setAlert('Register Success', 'success', 5000));
     }
-    if (responseData._message) {
+    if (responseData._message || responseData.message) {
       dispatch({ type: REGISTER_FAIL });
-      dispatch(setAlert(responseData.message, 'error', 5000));
+      dispatch(setAlert(responseData.message || responseData._message, 'error', 5000));
     }
   } catch (error) {
     dispatch({ type: REGISTER_FAIL });

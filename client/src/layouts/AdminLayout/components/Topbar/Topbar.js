@@ -12,6 +12,7 @@ import InputIcon from '@material-ui/icons/Input';
 
 // Component styles
 import styles from './styles';
+import logo from '../../../../assets/logo.jpg';
 
 class Topbar extends Component {
   static defaultProps = {
@@ -43,8 +44,15 @@ class Topbar extends Component {
       <div className={`${classes.root} , ${ToolbarClasses}`}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.brandWrapper}>
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <div className={classes.logo}>Sky Light Cinema</div>
+            <Link
+              to="/"
+              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img
+                src={logo}
+                alt="Sky Lights Cinema"
+                style={{ width: 36, height: 36, borderRadius: 8, background: '#fff', objectFit: 'cover' }}
+              />
+              <div className={classes.logo}>Sky Lights Cinema</div>
             </Link>
             <IconButton
               className={classes.menuButton}

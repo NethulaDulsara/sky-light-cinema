@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles, Typography } from '@material-ui/core';
 import styles from './styles';
 import { textTruncate } from '../../../../utils';
+import { POSTER_PLACEHOLDER } from '../../../../utils/poster';
 import { Link } from 'react-router-dom';
 
 const MovieCard = props => {
@@ -29,7 +30,7 @@ const MovieCard = props => {
         <header
           className={classes.header}
           style={{
-            backgroundImage: `url("${getImageUrl(movie.image)}")`,
+            backgroundImage: `url("${getImageUrl(movie.image)}"), url("${POSTER_PLACEHOLDER}")`,
           }}>
           <Typography className={classes.h4} variant="h4" color="inherit">
             {movie.genre}

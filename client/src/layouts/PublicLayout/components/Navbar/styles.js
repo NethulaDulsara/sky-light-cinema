@@ -4,7 +4,7 @@ export default theme => ({
     top: 0,
     left: 0,
     width: '100%',
-    padding: '1.25rem 20px',
+    padding: '1.1rem 34px',
     display: 'flex',
     flexWrap: 'wrap',
     alignItems: 'center',
@@ -12,28 +12,53 @@ export default theme => ({
     transform: 'translate3d(0,0,0)',
     backfaceVisibility: 'hidden',
     zIndex: 999,
-    transition: 'all 300ms ease-in'
+    background:
+      'linear-gradient(to bottom, rgba(7,10,16,0.78) 0%, rgba(7,10,16,0) 100%)',
+    transition: 'padding 300ms ease, background 300ms ease, box-shadow 300ms ease'
   },
   navbarColor: {
-    background: theme.palette.background.dark,
-    transition: 'all 200ms ease-out'
+    padding: '0.65rem 34px',
+    background: 'rgba(10, 14, 23, 0.82)',
+    backdropFilter: 'blur(14px)',
+    WebkitBackdropFilter: 'blur(14px)',
+    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.45)'
   },
   logoLink: {
-    display: 'inline-block',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '12px',
     paddingTop: '.15rem',
     paddingBottom: '.15rem',
     marginRight: '20px',
-    fontSize: '1.5rem',
     lineHeight: 'inherit',
     whiteSpace: 'nowrap',
     textDecoration: 'none'
   },
+  logoIcon: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    fontSize: '1.5rem',
+    borderRadius: 11,
+    color: '#fff',
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    boxShadow: '0 4px 16px rgba(0,114,255,0.45)'
+  },
   logo: {
     maxHeight: '2.4rem',
     width: 'auto',
-    fontSize: '2rem',
-    letterSpacing: '1px',
+    fontSize: '1.7rem',
+    fontWeight: 800,
+    letterSpacing: '0.4px',
+    lineHeight: 1,
     color: theme.palette.common.white
+  },
+  logoThin: {
+    fontWeight: 400,
+    color: theme.palette.text.secondary
   },
   navLinks: {
     marginLeft: 'auto',
@@ -41,32 +66,53 @@ export default theme => ({
   },
   navLink: {
     position: 'relative',
-    color: theme.palette.common.white,
-    padding: '0 .5rem',
-    margin: '0 1rem',
-    fontSize: '1.1rem',
-    fontWeight: '600',
+    color: 'rgba(255,255,255,0.82)',
+    padding: '6px 2px',
+    margin: '0 1.05rem',
+    fontSize: '0.98rem',
+    fontWeight: 600,
+    letterSpacing: '0.3px',
     cursor: 'pointer',
     textDecoration: 'none',
     zIndex: 2,
+    transition: 'color 200ms ease',
     '&:after': {
       content: '""',
       position: 'absolute',
       bottom: 0,
       left: 0,
-      width: '100%',
-      opacity: 0,
-      height: 0,
-      backgroundColor: 'rgba(255,255,255,0.5)',
-      transition: 'all 200ms linear',
+      right: 0,
+      margin: '0 auto',
+      width: 0,
+      height: '2px',
+      borderRadius: 2,
+      background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+      transition: 'width 220ms ease',
       zIndex: 1
     },
+    '&:hover': {
+      color: '#fff'
+    },
     '&:hover:after': {
-      opacity: 1,
-      height: '9px'
+      width: '100%'
     }
   },
-  navAccount: { marginLeft: 'auto', marginRight: theme.spacing(3) },
+  navAccount: {
+    marginLeft: 'auto',
+    marginRight: theme.spacing(2),
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(0.5),
+    '& .MuiIconButton-root': {
+      color: 'rgba(255,255,255,0.85)',
+      transition: 'color 200ms ease, background-color 200ms ease'
+    },
+    '& .MuiIconButton-root:hover': {
+      color: '#fff',
+      backgroundColor: 'rgba(255,255,255,0.08)'
+    }
+  },
+  iconBtn: {},
   navMobile: { marginRight: theme.spacing(1) },
   navIcon: {
     display: 'none',

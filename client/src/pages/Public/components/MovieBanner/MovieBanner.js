@@ -9,6 +9,7 @@ import {
   withStyles
 } from '@material-ui/core';
 import { textTruncate } from '../../../../utils';
+import { POSTER_PLACEHOLDER } from '../../../../utils/poster';
 import { Link } from 'react-router-dom';
 import ArrowRightAlt from '@material-ui/icons/ArrowRightAlt';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
@@ -61,12 +62,27 @@ function MovieBanner(props) {
                 </Typography>
               ))}
 
+              {movie.certification && (
+                <Typography
+                  className={classes.tag}
+                  variant="body1"
+                  color="inherit">
+                  {movie.certification}
+                </Typography>
+              )}
+
               <StyledRating
-                value={4}
+                value={movie.imdbRating ? movie.imdbRating / 2 : 4}
+                precision={0.5}
                 readOnly
                 size="small"
                 emptyIcon={<StarBorderIcon fontSize="inherit" />}
               />
+              {movie.imdbRating ? (
+                <Typography variant="body2" color="inherit" style={{ marginLeft: 8 }}>
+                  {movie.imdbRating.toFixed(1)}/10 IMDb
+                </Typography>
+              ) : null}
             </Box>
           )}
           <Typography
@@ -106,7 +122,7 @@ function MovieBanner(props) {
       <div
         className={classes.blurBackground}
         style={{
-          backgroundImage: `url("${getImageUrl(movie.image)}")`
+          backgroundImage: `url("${getImageUrl(movie.image)}"), url("${POSTER_PLACEHOLDER}")`
         }}
       />
       <div className={classes.movieActions}>

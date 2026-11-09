@@ -10,13 +10,10 @@ import { history } from '../../../../utils';
 
 const useStyles = makeStyles(theme => ({
   form: {
-    paddingLeft: '100px',
-    paddingRight: '100px',
-    paddingBottom: '125px',
-    flexBasis: '700px',
+    width: '100%',
+    padding: theme.spacing(0, 4, 4),
     [theme.breakpoints.down('sm')]: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(2)
+      padding: theme.spacing(0, 2, 2)
     }
   },
   title: {
@@ -79,6 +76,9 @@ function LoginForm(props) {
     if (isAuthenticated && redirect) {
       if (user && user.role === 'superadmin')
         return history.push('/admin/dashboard');
+      // Counter staff go straight to the box-office POS.
+      if (user && (user.role === 'cashier' || user.role === 'admin'))
+        return history.push('/pos');
       return history.push('/');
     }
   }, [isAuthenticated, user, redirect]);

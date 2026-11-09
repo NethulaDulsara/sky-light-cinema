@@ -71,66 +71,85 @@ const useStyles = makeStyles(theme => ({
   experienceRow: {
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: '#1a1a3a',
+    background: 'linear-gradient(145deg, #1a1a3a 0%, #15152e 100%)',
     padding: theme.spacing(3),
     marginBottom: theme.spacing(2),
-    borderRadius: '4px'
+    borderRadius: '12px',
+    border: '1px solid rgba(255,255,255,0.05)'
   },
   experienceName: {
     width: '200px',
-    fontSize: '24px',
+    fontSize: '22px',
     fontWeight: 'bold',
-    color: '#f8f9fa'
+    color: '#f8f9fa',
+    letterSpacing: '0.5px'
   },
   timeButton: {
-    border: '1px solid #fff',
-    borderRadius: '8px',
+    border: '1px solid rgba(255,255,255,0.35)',
+    borderRadius: '10px',
     padding: theme.spacing(1, 3),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    minWidth: '120px',
+    minWidth: '110px',
     marginRight: theme.spacing(2),
+    marginBottom: theme.spacing(1),
     transition: 'all 0.2s',
     '&:hover': {
-      backgroundColor: 'rgba(255,255,255,0.1)'
+      backgroundColor: 'rgba(0,198,255,0.12)',
+      borderColor: '#00C6FF',
+      transform: 'translateY(-2px)'
     }
   },
   timeValue: { fontSize: '16px', fontWeight: 800 },
-  timeType: { fontSize: '10px', fontWeight: 600 },
+  timeType: { fontSize: '10px', fontWeight: 600, color: '#00C6FF', marginTop: '2px' },
   modal: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
   },
   modalPaper: {
-    backgroundColor: '#fff',
-    borderRadius: '16px',
-    padding: theme.spacing(4, 6),
+    background: 'linear-gradient(145deg, #161d31 0%, #0c101c 100%)',
+    borderRadius: '20px',
+    border: '1px solid rgba(0, 198, 255, 0.25)',
+    boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(0,198,255,0.12)',
+    padding: theme.spacing(5, 6),
     width: '420px',
+    maxWidth: '90vw',
     textAlign: 'center',
     outline: 'none',
     position: 'relative',
-    color: '#000',
+    color: '#f8fafc',
     fontFamily: 'Montserrat, sans-serif'
   },
   modalClose: {
     position: 'absolute',
-    top: '-15px',
-    right: '-15px',
-    backgroundColor: '#0a0a20',
-    color: '#fff',
-    padding: '8px',
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    color: '#94a3b8',
+    padding: '6px',
+    transition: 'all 0.2s ease',
     '&:hover': {
-      backgroundColor: '#1a1a3a'
+      backgroundColor: 'rgba(239,68,68,0.2)',
+      color: '#ef4444',
+      borderColor: 'rgba(239,68,68,0.4)',
+      transform: 'rotate(90deg)'
     }
   },
-  ticketIcon: { 
-    fontSize: '60px', 
-    margin: '10px 0',
-    color: '#000',
+  modalTitle: {
+    fontWeight: 700,
+    letterSpacing: '1px',
+    textTransform: 'uppercase',
+    color: '#fff'
+  },
+  ticketIcon: {
+    fontSize: '56px',
+    margin: '18px 0 8px',
+    color: '#00C6FF',
     transform: 'rotate(-20deg)'
   },
   counterRow: {
@@ -141,26 +160,31 @@ const useStyles = makeStyles(theme => ({
     margin: '20px 0 30px'
   },
   counterBtn: {
-    border: '2px solid #ccc',
+    border: '2px solid rgba(255,255,255,0.25)',
     padding: '6px',
-    color: '#ccc',
+    color: '#cbd5e1',
+    transition: 'all 0.2s',
     '&:hover': {
-      color: '#000',
-      borderColor: '#000'
+      color: '#00C6FF',
+      borderColor: '#00C6FF'
     }
   },
-  counterValue: { fontSize: '20px', fontWeight: 700, color: '#e63946' },
+  counterValue: { fontSize: '22px', fontWeight: 800, color: '#ff4d6d', minWidth: '32px' },
   selectSeatsBtn: {
-    backgroundColor: '#35297e',
+    background: 'linear-gradient(135deg, #00C6FF 0%, #0072ff 100%)',
     color: '#fff',
     width: '100%',
     padding: '12px',
-    fontWeight: 'bold',
+    fontWeight: 700,
     fontSize: '14px',
     letterSpacing: '1px',
-    borderRadius: '4px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 20px rgba(0,198,255,0.4)',
+    transition: 'all 0.2s ease',
     '&:hover': {
-      backgroundColor: '#261c5c'
+      background: 'linear-gradient(135deg, #00b4e6 0%, #0060d6 100%)',
+      boxShadow: '0 6px 25px rgba(0,198,255,0.6)',
+      transform: 'translateY(-1px)'
     }
   }
 }));
@@ -268,23 +292,35 @@ export default function BookingForm(props) {
 
           if (cShowtimes.length === 0) return null;
 
-          // Deduplicate times just in case
-          const times = [...new Set(cShowtimes.map(st => st.startAt))].sort();
+          // Group showtimes by screen format so each experience (2D/3D/IMAX/4DX)
+          // is shown on its own row with the correct label.
+          const byFormat = {};
+          cShowtimes.forEach(st => {
+            const f = st.format || '2D';
+            (byFormat[f] = byFormat[f] || new Set()).add(st.startAt);
+          });
 
           return (
             <div key={cinema._id}>
               <Typography className={classes.cinemaName}>{cinema.name}</Typography>
-              <div className={classes.experienceRow}>
-                <div className={classes.experienceName}>DIGITAL 2D</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {times.map(t => (
-                    <div key={t} className={classes.timeButton} onClick={() => handleTimeClick(cinema._id, t)}>
-                      <div className={classes.timeValue}>{t}</div>
-                      <div className={classes.timeType}>2D</div>
+              {Object.keys(byFormat).sort().map(fmt => {
+                const times = [...byFormat[fmt]].sort();
+                return (
+                  <div key={fmt} className={classes.experienceRow}>
+                    <div className={classes.experienceName}>
+                      {fmt === '2D' ? 'DIGITAL 2D' : fmt}
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                      {times.map(t => (
+                        <div key={t} className={classes.timeButton} onClick={() => handleTimeClick(cinema._id, t)}>
+                          <div className={classes.timeValue}>{t}</div>
+                          <div className={classes.timeType}>{fmt}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           );
         })}
@@ -301,10 +337,10 @@ export default function BookingForm(props) {
           <IconButton className={classes.modalClose} onClick={() => setModalOpen(false)}>
             <CloseIcon fontSize="small" />
           </IconButton>
-          <Typography variant="h6" style={{ fontWeight: 500, letterSpacing: '1px' }}>HOW MANY TICKETS ?</Typography>
+          <Typography variant="h6" className={classes.modalTitle}>How Many Tickets?</Typography>
           <ConfirmationNumberOutlinedIcon className={classes.ticketIcon} />
-          <Typography variant="body2" style={{ fontWeight: 600, fontSize: '13px' }}>No. Of Tickets</Typography>
-          <Typography variant="caption" color="textSecondary" style={{ fontSize: '10px' }}>(Max 10)</Typography>
+          <Typography variant="body2" style={{ fontWeight: 700, fontSize: '13px', color: '#f8fafc' }}>No. of Tickets</Typography>
+          <Typography variant="caption" style={{ fontSize: '11px', color: '#94a3b8' }}>(Max 10)</Typography>
           <div className={classes.counterRow}>
             <IconButton className={classes.counterBtn} onClick={() => setTicketCount(Math.max(1, ticketCount - 1))}>
               <RemoveIcon fontSize="small" />

@@ -8,7 +8,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TablePagination
+  TablePagination,
+  Button
 } from '@material-ui/core';
 
 import { Portlet, PortletContent } from '../../../../../components';
@@ -25,6 +26,7 @@ class ReservationsTable extends Component {
     classes: PropTypes.object.isRequired,
     onSelect: PropTypes.func,
     onShowDetails: PropTypes.func,
+    onCancel: PropTypes.func,
     reservations: PropTypes.array.isRequired,
     movies: PropTypes.array.isRequired,
     cinemas: PropTypes.array.isRequired
@@ -75,7 +77,9 @@ class ReservationsTable extends Component {
                 <TableCell align="left">Cinema</TableCell>
                 <TableCell align="left">Ticket Price</TableCell>
                 <TableCell align="left">Total</TableCell>
+                <TableCell align="left">Payment</TableCell>
                 <TableCell align="left">Checkin</TableCell>
+                <TableCell align="left">Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -182,6 +186,33 @@ class ReservationsTable extends Component {
                         }} />
                         {reservation.checkin ? 'Checked In' : 'Pending'}
                       </span>
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      <span style={{
+                        textTransform: 'uppercase',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color:
+                          reservation.paymentStatus === 'paid' ? '#34d399'
+                          : reservation.paymentStatus === 'refunded' ? '#a5b4fc'
+                          : ['cancelled', 'failed', 'expired'].includes(reservation.paymentStatus) ? '#f87171'
+                          : '#fbbf24'
+                      }}>
+                        {reservation.paymentStatus || 'pending'}
+                      </span>
+                    </TableCell>
+                    <TableCell className={classes.tableCell}>
+                      {['cancelled', 'refunded', 'expired', 'failed'].includes(reservation.paymentStatus) ? (
+                        <span style={{ opacity: 0.4 }}>—</span>
+                      ) : (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => this.props.onCancel && this.props.onCancel(reservation)}
+                          style={{ color: '#f87171', borderColor: 'rgba(248,113,113,0.4)' }}>
+                          Cancel
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

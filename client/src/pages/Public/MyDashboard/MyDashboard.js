@@ -1,8 +1,15 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { makeStyles, Grid, Typography, Container } from '@material-ui/core';
-import { getMovies, getReservations, getCinemas } from '../../../store/actions';
+import { Redirect } from 'react-router-dom';
+import {
+  getMovies,
+  getMyReservations,
+  getCinemas,
+  cancelReservation
+} from '../../../store/actions';
 import { MyReservationTable } from './components';
+import MyWatchlist from './components/MyWatchlist/MyWatchlist';
 import Account from '../../Admin/Account';
 
 const useStyles = makeStyles(theme => ({
@@ -26,23 +33,35 @@ function MyDashboard(props) {
     movies,
     cinemas,
     getMovies,
-    getReservations,
-    getCinemas
+    getMyReservations,
+    getCinemas,
+    cancelReservation
   } = props;
 
   useEffect(() => {
     getMovies();
-    getReservations();
+    getMyReservations();
     getCinemas();
-  }, [getMovies, getReservations, getCinemas]);
+  }, [getMovies, getMyReservations, getCinemas]);
 
   const classes = useStyles(props);
 
-  const myReservations = reservations.filter(
-    reservation => reservation.username === user.username
-  );
+  // This dashboard is for signed-in users; guests are sent to login.
+  if (!user) return <Redirect to="/login" />;
 
-  console.log(myReservations);
+  // The /reservations/mine endpoint already scopes to this user.
+  const myReservations = reservations;
+
+  const handleCancel = async reservation => {
+    const msg =
+      reservation.paymentStatus === 'paid'
+        ? 'Cancel this booking? Eligible bookings are refunded automatically.'
+        : 'Cancel this booking?';
+    if (window.confirm(msg)) {
+      await cancelReservation(reservation._id);
+      getMyReservations(); // refresh this user's own list
+    }
+  };
 
   return (
     <Container>
@@ -62,10 +81,14 @@ function MyDashboard(props) {
                 reservations={myReservations}
                 movies={movies}
                 cinemas={cinemas}
+                onCancel={handleCancel}
               />
             </Grid>
           </>
         )}
+        <Grid item xs={12}>
+          <MyWatchlist />
+        </Grid>
         <Grid item xs={12}>
           <Typography className={classes.title} variant="h2" color="inherit">
             My Account
@@ -91,7 +114,7 @@ const mapStateToProps = ({
   cinemas: cinemaState.cinemas
 });
 
-const mapDispatchToProps = { getMovies, getReservations, getCinemas };
+const mapDispatchToProps = { getMovies, getMyReservations, getCinemas, cancelReservation };
 
 export default connect(
   mapStateToProps,

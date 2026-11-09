@@ -1,8 +1,43 @@
 const express = require('express');
 const auth = require('../middlewares/auth');
 const Showtime = require('../models/showtime');
+const Reservation = require('../models/reservation');
+const SeatLock = require('../models/seatLock');
 
 const router = new express.Router();
+
+// Guest-safe seat availability for a showtime: booked seats (paid, or pending
+// with an unexpired hold) and seats currently held by other sessions. Returns
+// only seat coordinates — never customer PII.
+router.get('/showtimes/:id/seats', async (req, res) => {
+  const showtimeId = req.params.id;
+  try {
+    const now = new Date();
+    const reservations = await Reservation.find({
+      showtimeId,
+      $or: [
+        { paymentStatus: 'paid' },
+        { paymentStatus: 'pending', holdExpiresAt: { $gt: now } },
+      ],
+    }).select('seats');
+
+    const booked = reservations.reduce(
+      (acc, r) => acc.concat(Array.isArray(r.seats) ? r.seats : []),
+      []
+    );
+
+    const locks = await SeatLock.find({
+      showtimeId,
+      expiresAt: { $gt: now },
+    }).select('seat sessionId');
+
+    const held = locks.map(l => ({ seat: l.seat, sessionId: l.sessionId }));
+
+    res.send({ booked, held });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
 
 // Create a showtime
 router.post('/showtimes', auth.enhance, async (req, res) => {
@@ -40,7 +75,7 @@ router.get('/showtimes/:id', async (req, res) => {
 router.patch('/showtimes/:id', auth.enhance, async (req, res) => {
   const _id = req.params.id;
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['startAt', 'startDate', 'endDate', 'movieId', 'cinemaId'];
+  const allowedUpdates = ['startAt', 'startDate', 'endDate', 'movieId', 'cinemaId', 'format', 'frozenSeats'];
   const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
   if (!isValidOperation) return res.status(400).send({ error: 'Invalid updates!' });

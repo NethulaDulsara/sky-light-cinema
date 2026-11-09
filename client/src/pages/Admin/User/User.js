@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { withStyles, CircularProgress } from '@material-ui/core';
+import { withStyles, CircularProgress, Tabs, Tab } from '@material-ui/core';
 import styles from './styles';
 import { UsersToolbar, UsersTable, AddUser } from './components';
 import {
@@ -15,7 +15,12 @@ import {
 } from '../../../store/actions';
 import { ResponsiveDialog } from '../../../components';
 
+// Staff = admins / super admins; Customers = guests who book tickets.
+const isStaff = u => u.role && u.role !== 'guest';
+
 class User extends Component {
+  state = { tab: 0 };
+
   static propTypes = {
     className: PropTypes.string,
     classes: PropTypes.object.isRequired
@@ -37,6 +42,7 @@ class User extends Component {
       selectUser,
       selectAllUsers
     } = this.props;
+    const { tab } = this.state;
 
     if (!users.length) {
       return (
@@ -45,13 +51,29 @@ class User extends Component {
         </div>
       );
     }
+
+    const staff = users.filter(isStaff);
+    const customers = users.filter(u => !isStaff(u));
+    const shown = tab === 0 ? staff : customers;
+
     return (
-      <UsersTable
-        onSelect={selectUser}
-        onSelectAll={selectAllUsers}
-        users={users}
-        selectedUsers={selectedUsers}
-      />
+      <>
+        <Tabs
+          value={tab}
+          onChange={(e, value) => this.setState({ tab: value })}
+          indicatorColor="primary"
+          textColor="primary"
+          style={{ marginBottom: 16 }}>
+          <Tab label={`Staff & Admins (${staff.length})`} />
+          <Tab label={`Customers (${customers.length})`} />
+        </Tabs>
+        <UsersTable
+          onSelect={selectUser}
+          onSelectAll={selectAllUsers}
+          users={shown}
+          selectedUsers={selectedUsers}
+        />
+      </>
     );
   }
   render() {

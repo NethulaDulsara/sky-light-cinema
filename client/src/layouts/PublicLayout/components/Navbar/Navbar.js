@@ -3,10 +3,19 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { logout } from '../../../../store/actions';
 import classnames from 'classnames';
-import { withStyles, Typography, List, ListItem } from '@material-ui/core';
+import {
+  withStyles,
+  Typography,
+  List,
+  ListItem,
+  IconButton,
+  Tooltip
+} from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 
 // Component styles
 import styles from './styles';
+import logo from '../../../../assets/logo.jpg';
 import UserPopover from './components/UserPopover/UserPopover';
 
 class Navbar extends Component {
@@ -36,13 +45,32 @@ class Navbar extends Component {
             [classes.navbar]: true,
             [classes.navbarColor]: scrollPos > 30
           })}>
-          <Link className={classes.logoLink} to="/">
+          <Link
+            className={classes.logoLink}
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <img
+              src={logo}
+              alt="Sky Lights Cinema"
+              style={{
+                height: 46,
+                width: 46,
+                borderRadius: 10,
+                background: '#fff',
+                objectFit: 'cover',
+                marginRight: 12,
+                flexShrink: 0
+              }}
+            />
             <Typography className={classes.logo} variant="h2">
-              Sky Light Cinema
+              Sky Lights <span className={classes.logoThin}>Cinema</span>
             </Typography>
           </Link>
           <div className={classes.navLinks}>
-            <Link className={classes.navLink} to="/">
+            <Link
+              className={classes.navLink}
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               Home
             </Link>
             <Link className={classes.navLink} to="/movie/category/nowShowing">
@@ -57,6 +85,15 @@ class Navbar extends Component {
           </div>
 
           <div className={classes.navAccount}>
+            <Tooltip title="Search movies">
+              <IconButton
+                className={classes.iconBtn}
+                component={Link}
+                to="/search"
+                aria-label="Search movies">
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
             <UserPopover logout={logout}>
               <List component="nav">
                 {user && (
@@ -121,7 +158,10 @@ class Navbar extends Component {
               className={classes.innerNav}
               onClick={() => this.setState({ showMenu: !this.state.showMenu })}>
               <li className={classes.innerNavListItem}>
-                <Link className={classes.innerNavLink} to="/">
+                <Link
+                  className={classes.innerNavLink}
+                  to="/"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                   Home
                 </Link>
               </li>
@@ -142,6 +182,11 @@ class Navbar extends Component {
               <li className={classes.innerNavListItem}>
                 <Link className={classes.innerNavLink} to="/cinemas">
                   Cinemas
+                </Link>
+              </li>
+              <li className={classes.innerNavListItem}>
+                <Link className={classes.innerNavLink} to="/search">
+                  Search
                 </Link>
               </li>
             </ul>

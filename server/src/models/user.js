@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
 
 const { Schema } = mongoose;
 const userSchema = Schema(
@@ -43,7 +44,7 @@ const userSchema = Schema(
     role: {
       type: String,
       default: 'guest',
-      enum: ['guest', 'admin', 'superadmin'],
+      enum: ['guest', 'cashier', 'admin', 'superadmin'],
     },
 
     facebook: String,
@@ -91,7 +92,7 @@ userSchema.methods.toJSON = function() {
 
 userSchema.methods.generateAuthToken = async function() {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, 'mySecret');
+  const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET);
   user.tokens = user.tokens.concat({ token });
   await user.save();
   return token;

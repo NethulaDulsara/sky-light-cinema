@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core';
 import { Button, TextField, Typography } from '@material-ui/core';
 import styles from './styles';
 import { Add } from '@material-ui/icons';
+import SeatFreezePicker from '../../../../../components/SeatFreezePicker';
 import {
   getCinemas,
   createCinemas,
@@ -23,6 +24,7 @@ class AddCinema extends Component {
     city: '',
     seatsAvailable: '',
     seats: [],
+    frozenSeats: [],
     notification: {}
   };
 
@@ -53,9 +55,10 @@ class AddCinema extends Component {
       ticketPrice,
       city,
       seatsAvailable,
-      seats
+      seats,
+      frozenSeats
     } = this.state;
-    const cinema = { name, ticketPrice: Number(ticketPrice), city, seatsAvailable: Number(seatsAvailable), seats };
+    const cinema = { name, ticketPrice: Number(ticketPrice), city, seatsAvailable: Number(seatsAvailable), seats, frozenSeats: frozenSeats || [] };
     let notification = {};
     type === 'create'
       ? (notification = await createCinemas(image, cinema))
@@ -208,6 +211,22 @@ class AddCinema extends Component {
           </div>
 
           {this.renderSeatFields()}
+
+          {this.state.seats && this.state.seats.length > 0 && (
+            <div className={classes.field}>
+              <Typography variant="subtitle1" style={{ fontWeight: 700, marginTop: 8 }}>
+                Freeze Seats (hall-wide)
+              </Typography>
+              <Typography variant="body2" style={{ color: '#94a3b8', marginBottom: 8 }}>
+                Frozen seats are blocked on every showtime in this hall.
+              </Typography>
+              <SeatFreezePicker
+                seats={this.state.seats}
+                value={this.state.frozenSeats}
+                onChange={frozenSeats => this.setState({ frozenSeats })}
+              />
+            </div>
+          )}
 
           <div className={classes.actions}>
             <Button
