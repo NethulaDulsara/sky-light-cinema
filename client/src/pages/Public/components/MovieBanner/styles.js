@@ -126,17 +126,17 @@ export default theme => ({
     padding: theme.spacing(0, 3.5),
     borderRadius: 999,
     zIndex: 2,
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     color: '#fff',
     fontSize: '0.95rem',
     fontWeight: 700,
     letterSpacing: '0.5px',
-    boxShadow: '0 10px 30px rgba(0,114,255,0.45)',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
     '&:hover': {
-      background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)',
+      backgroundColor: '#008cd1',
       transform: 'translateY(-2px)',
-      boxShadow: '0 14px 36px rgba(0,114,255,0.55)'
+      boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)'
     }
   },
   learnMore: { color: '#fff' },

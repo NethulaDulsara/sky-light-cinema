@@ -125,12 +125,12 @@ const theme = createMuiTheme({
         transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
       },
       containedPrimary: {
-        background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+        backgroundColor: '#00a0ee',
         color: '#ffffff',
-        boxShadow: '0 4px 15px rgba(0, 198, 255, 0.35)',
+        boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
         '&:hover': {
-          background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)',
-          boxShadow: '0 6px 20px rgba(0, 198, 255, 0.55)',
+          backgroundColor: '#008cd1',
+          boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)',
           transform: 'translateY(-1px)'
         }
       },

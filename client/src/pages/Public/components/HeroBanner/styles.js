@@ -135,13 +135,14 @@ export default makeStyles(theme => ({
     borderRadius: 999,
     fontWeight: 700,
     letterSpacing: '0.4px',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     color: '#fff',
-    boxShadow: '0 10px 26px rgba(0,114,255,0.45)',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
     '&:hover': {
-      background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)',
-      transform: 'translateY(-2px)'
+      backgroundColor: '#008cd1',
+      transform: 'translateY(-2px)',
+      boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)'
     }
   },
 
@@ -167,7 +168,7 @@ export default makeStyles(theme => ({
     },
     '.slick-dots li.slick-active button:before': {
       width: 34,
-      background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)'
+      backgroundColor: '#00a0ee'
     }
   },
 

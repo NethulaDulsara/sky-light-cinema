@@ -9,9 +9,9 @@ import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255, 255, 255, 0.05)',
+    background: 'rgba(13, 17, 30, 0.65)',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '16px',
     boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
@@ -35,10 +35,10 @@ const useStyles = makeStyles(theme => ({
     marginTop: theme.spacing(1)
   },
   avatar: {
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     height: 56,
     width: 56,
-    boxShadow: '0 4px 20px 0 rgba(0, 114, 255, 0.4)'
+    boxShadow: '0 4px 20px 0 rgba(0, 160, 238, 0.4)'
   },
   icon: {
     height: 32,

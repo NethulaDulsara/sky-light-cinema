@@ -67,7 +67,7 @@ export default function Footer() {
           </Link>
         ))}
         <Typography variant="caption">
-          Designed and Developed by Antigravity.
+          Designed and Developed by Rapid Solution.
         </Typography>
       </div>
     </div>

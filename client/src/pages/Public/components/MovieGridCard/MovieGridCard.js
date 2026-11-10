@@ -75,10 +75,10 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 999,
     fontWeight: 700,
     letterSpacing: '0.3px',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     color: '#fff',
-    boxShadow: '0 8px 22px rgba(0,114,255,0.4)',
-    '&:hover': { background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)' }
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
+    '&:hover': { backgroundColor: '#008cd1' }
   },
   body: {
     padding: theme.spacing(1.75, 1.75, 2),

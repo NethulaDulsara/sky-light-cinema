@@ -29,15 +29,15 @@ export default theme => ({
   },
   content: {
     minHeight: '100vh',
-    padding: theme.spacing(3),
-    paddingTop: `calc(${theme.topBar.height} + ${theme.spacing(3)}px)`,
+    padding: 0,
+    paddingTop: theme.topBar.height,
     marginLeft: '270px',
     backgroundColor: theme.palette.background.default,
     transition: 'margin-left 0.2s ease',
     [theme.breakpoints.down('sm')]: {
       marginLeft: 0,
-      padding: theme.spacing(2),
-      paddingTop: `calc(${theme.topBar.height} + ${theme.spacing(2)}px)`
+      padding: 0,
+      paddingTop: theme.topBar.height
     }
   }
 });

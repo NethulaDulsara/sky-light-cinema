@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withStyles, Grid, Typography } from '@material-ui/core';
+import auditoriumBg from '../../../assets/auditorium.jpg';
 import {
   TotalUsers,
   TotalCinemas,
@@ -18,10 +19,19 @@ import {
 
 const styles = theme => ({
   root: {
+    boxSizing: 'border-box',
+    width: '100%',
     padding: theme.spacing(4),
-    background: 'radial-gradient(circle at 10% 20%, rgba(30,30,40,1) 0%, rgba(18,18,24,1) 90%)',
-    minHeight: '100vh',
+    position: 'relative',
+    minHeight: `calc(100vh - ${theme.topBar.height})`,
     color: theme.palette.common.white,
+    backgroundImage: `linear-gradient(135deg, rgba(8, 12, 26, 0.72) 0%, rgba(6, 9, 20, 0.80) 50%, rgba(8, 12, 24, 0.75) 100%), radial-gradient(circle at 85% 25%, rgba(0, 160, 238, 0.18) 0%, transparent 55%), url(${auditoriumBg})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center top',
+    backgroundRepeat: 'no-repeat',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2)
+    }
   },
   header: {
     marginBottom: theme.spacing(5),
@@ -29,13 +39,13 @@ const styles = theme => ({
   },
   greeting: {
     fontWeight: 800,
-    background: '-webkit-linear-gradient(45deg, #FF6B6B 30%, #FF8E53 90%)',
+    background: 'linear-gradient(45deg, #00a0ee 30%, #38bdf8 90%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     letterSpacing: '1px'
   },
   subtitle: {
-    color: theme.palette.text.secondary,
+    color: 'rgba(255, 255, 255, 0.7)',
     marginTop: theme.spacing(1),
     fontWeight: 500
   }
@@ -44,10 +54,13 @@ const styles = theme => ({
 const KpiCard = ({ label, value, accent }) => (
   <div
     style={{
-      background: 'rgba(255,255,255,0.06)',
-      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'rgba(13, 17, 30, 0.65)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
       borderRadius: 14,
-      padding: '20px 22px'
+      padding: '20px 22px',
+      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)'
     }}>
     <div style={{ fontSize: 13, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 1 }}>
       {label}
@@ -147,10 +160,13 @@ class Dashboard extends Component {
               <Grid item xs={12}>
                 <div
                   style={{
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'rgba(13, 17, 30, 0.65)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: 14,
-                    padding: '18px 22px'
+                    padding: '18px 22px',
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)'
                   }}>
                   <div style={{ fontSize: 13, opacity: 0.7, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>
                     Revenue by Format

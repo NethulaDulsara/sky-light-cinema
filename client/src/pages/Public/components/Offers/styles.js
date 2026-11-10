@@ -62,8 +62,8 @@ export default makeStyles(theme => ({
     fontSize: '0.8rem',
     letterSpacing: '0.5px',
     color: '#fff',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
-    boxShadow: '0 4px 14px rgba(0,114,255,0.45)'
+    backgroundColor: '#00a0ee',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)'
   },
   offerText: {
     position: 'absolute',
@@ -92,13 +92,14 @@ export default makeStyles(theme => ({
     padding: theme.spacing(1, 4),
     alignSelf: 'flex-start',
     borderRadius: 999,
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     color: '#fff',
     fontWeight: 700,
     letterSpacing: '0.3px',
-    boxShadow: '0 8px 22px rgba(0,114,255,0.35)',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
     '&:hover': {
-      background: 'linear-gradient(135deg, #1ad2ff 0%, #1a82ff 100%)'
+      backgroundColor: '#008cd1',
+      boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)'
     }
   }
 }));

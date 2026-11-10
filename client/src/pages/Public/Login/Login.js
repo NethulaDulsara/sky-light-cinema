@@ -8,6 +8,7 @@ import StarIcon from '@material-ui/icons/StarBorderOutlined';
 import FlashOnIcon from '@material-ui/icons/FlashOnOutlined';
 import LoginForm from './components/LoginForm';
 import logo from '../../../assets/logo.jpg';
+import auditoriumBg from '../../../assets/auditorium.jpg';
 
 const BENEFITS = [
   { icon: FlashOnIcon, title: 'Faster checkout', text: 'Your details are pre-filled every time.' },
@@ -35,8 +36,7 @@ const styles = theme => ({
     justifyContent: 'center',
     padding: theme.spacing(8),
     color: '#fff',
-    backgroundImage:
-      'linear-gradient(135deg, rgba(7,8,15,0.55) 0%, rgba(7,8,15,0.92) 100%), url(https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1400&q=80)',
+    backgroundImage: `linear-gradient(135deg, rgba(7, 10, 20, 0.45) 0%, rgba(7, 10, 20, 0.85) 100%), url(${auditoriumBg})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center'
   },
@@ -45,7 +45,7 @@ const styles = theme => ({
     fontWeight: 800,
     letterSpacing: '0.5px',
     marginBottom: theme.spacing(1),
-    background: 'linear-gradient(90deg,#00C6FF 0%,#7b61ff 100%)',
+    background: 'linear-gradient(90deg,#00a0ee 0%,#38bdf8 100%)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent'
   },
@@ -60,7 +60,7 @@ const styles = theme => ({
     fontSize: '0.8rem',
     letterSpacing: '2px',
     textTransform: 'uppercase',
-    color: '#00C6FF',
+    color: '#00a0ee',
     marginBottom: theme.spacing(2)
   },
   benefit: {
@@ -71,8 +71,8 @@ const styles = theme => ({
     maxWidth: 440
   },
   benefitIcon: {
-    color: '#00C6FF',
-    background: 'rgba(0,198,255,0.1)',
+    color: '#00a0ee',
+    background: 'rgba(0, 160, 238, 0.14)',
     borderRadius: 10,
     padding: 8,
     fontSize: 36

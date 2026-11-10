@@ -218,8 +218,6 @@ class AddShowtime extends Component {
                 id="start-date"
                 label="Start Date"
                 format="MMMM Do YYYY"
-                minDate={new Date()}
-                maxDate={this.onFilterMaxDate()}
                 value={startDate}
                 onChange={date => {
                   const d = date && date.toDate ? date.toDate() : (date && date._d ? date._d : new Date(date || Date.now()));
@@ -233,8 +231,7 @@ class AddShowtime extends Component {
                 id="end-date"
                 label="End Date"
                 format="MMMM Do YYYY"
-                minDate={new Date(startDate || Date.now())}
-                maxDate={this.onFilterMaxDate()}
+                minDate={new Date(new Date(startDate || Date.now()).setHours(0, 0, 0, 0))}
                 value={endDate}
                 onChange={date => {
                   const d = date && date.toDate ? date.toDate() : (date && date._d ? date._d : new Date(date || Date.now()));

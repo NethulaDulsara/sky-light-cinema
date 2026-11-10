@@ -19,9 +19,9 @@ import TabletMacIcon from '@material-ui/icons/TabletMac';
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255, 255, 255, 0.05)',
+    background: 'rgba(13, 17, 30, 0.65)',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     borderRadius: '16px',
     boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
     color: 'rgba(255, 255, 255, 0.8)'

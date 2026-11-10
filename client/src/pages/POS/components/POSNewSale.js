@@ -15,6 +15,8 @@ import LocalAtmIcon from '@material-ui/icons/LocalAtmOutlined';
 import CreditCardIcon from '@material-ui/icons/CreditCardOutlined';
 import PauseIcon from '@material-ui/icons/PauseCircleOutlineOutlined';
 import CloseIcon from '@material-ui/icons/Close';
+import PrintIcon from '@material-ui/icons/PrintOutlined';
+import AddIcon from '@material-ui/icons/AddRounded';
 
 import BookingSeats from '../../Public/BookingPage/components/BookingSeats/BookingSeats';
 import CashPaymentDialog from './CashPaymentDialog';
@@ -31,7 +33,7 @@ import {
   getPosQuote
 } from '../../../store/actions';
 
-const ACCENT = 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)';
+const ACCENT = '#00a0ee';
 
 const useStyles = makeStyles(theme => ({
   grid: {
@@ -83,13 +85,15 @@ const useStyles = makeStyles(theme => ({
   heldMovie: { fontWeight: 700, color: '#fff' },
   heldMeta: { color: '#94a3b8' },
   payHeld: {
-    background: ACCENT,
+    backgroundColor: ACCENT,
     color: '#fff',
     textTransform: 'none',
     fontWeight: 700,
     borderRadius: 8,
     padding: theme.spacing(0.4, 1.5),
-    minWidth: 0
+    minWidth: 0,
+    boxShadow: '0 2px 6px rgba(0, 160, 238, 0.25)',
+    '&:hover': { backgroundColor: '#008cd1' }
   },
   summary: {
     background: '#0a0e17',
@@ -142,7 +146,12 @@ const useStyles = makeStyles(theme => ({
     color: '#cbd5e1',
     padding: theme.spacing(1.2, 0)
   },
-  payBtnActive: { border: '1px solid transparent', background: ACCENT, color: '#fff' },
+  payBtnActive: {
+    border: '1px solid transparent',
+    backgroundColor: ACCENT,
+    color: '#fff',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)'
+  },
   actionsRow: { display: 'flex', gap: theme.spacing(1.5), marginTop: theme.spacing(2) },
   holdBtn: {
     flex: 1,
@@ -155,34 +164,165 @@ const useStyles = makeStyles(theme => ({
   },
   completeBtn: {
     flex: 2,
-    background: ACCENT,
+    backgroundColor: ACCENT,
     color: '#fff',
     fontWeight: 800,
     borderRadius: 10,
     padding: theme.spacing(1.3, 0),
     textTransform: 'none',
     fontSize: '0.95rem',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#008cd1',
+      boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)'
+    },
     '&:disabled': { background: 'rgba(255,255,255,0.1)', color: '#64748b' }
   },
   muted: { color: '#94a3b8', fontSize: 13 },
   success: {
-    background: '#0a0e17',
-    border: '1px solid rgba(0,198,255,0.25)',
-    borderRadius: 14,
-    padding: theme.spacing(5),
+    background: '#101625',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
+    padding: theme.spacing(4.5, 4),
     textAlign: 'center',
     maxWidth: 440,
-    margin: '0 auto'
+    margin: '24px auto',
+    boxShadow: '0 24px 60px rgba(0, 0, 0, 0.55)',
+    position: 'relative',
+    overflow: 'hidden',
+    '&:before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 4,
+      background: '#00a0ee'
+    }
   },
-  successIcon: { color: '#00cc66', fontSize: 64 },
-  qr: { width: 180, height: 180, margin: theme.spacing(2, 'auto'), display: 'block' },
-  ref: { fontFamily: 'monospace', color: '#9bdcff', fontWeight: 700, letterSpacing: 1 }
+  successBadge: {
+    width: 60,
+    height: 60,
+    borderRadius: '50%',
+    background: 'rgba(16, 185, 129, 0.12)',
+    border: '1px solid rgba(16, 185, 129, 0.28)',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing(1.5),
+    color: '#10b981'
+  },
+  successIcon: { fontSize: 34 },
+  seatSection: {
+    margin: '18px auto 14px',
+    padding: '12px 18px',
+    borderRadius: 14,
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.07)',
+    display: 'inline-block',
+    minWidth: 200
+  },
+  seatSectionTitle: {
+    fontSize: 10,
+    fontWeight: 700,
+    letterSpacing: 1.8,
+    color: '#64748b',
+    marginBottom: 8,
+    textTransform: 'uppercase'
+  },
+  seatPill: {
+    fontSize: 14,
+    fontWeight: 800,
+    color: '#ffffff',
+    backgroundColor: '#00a0ee',
+    borderRadius: 8,
+    padding: '5px 14px',
+    letterSpacing: 0.5,
+    display: 'inline-flex',
+    alignItems: 'center',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)'
+  },
+  qrCard: {
+    background: '#ffffff',
+    padding: 12,
+    borderRadius: 16,
+    display: 'inline-block',
+    margin: '10px auto 8px',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)'
+  },
+  qr: { width: 160, height: 160, display: 'block', borderRadius: 4 },
+  refBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    fontSize: 12,
+    letterSpacing: 1.5,
+    background: 'rgba(255, 255, 255, 0.04)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: 20,
+    padding: '4px 14px',
+    margin: '4px auto 14px'
+  },
+  paymentSummary: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.07)',
+    borderRadius: 12,
+    padding: '14px 18px',
+    margin: '6px 0 18px',
+    textAlign: 'left'
+  },
+  methodPill: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: 0.8,
+    padding: '4px 10px',
+    borderRadius: 6,
+    color: '#00a0ee',
+    background: 'rgba(0, 160, 238, 0.12)',
+    border: '1px solid rgba(0, 160, 238, 0.28)'
+  },
+  printBtn: {
+    flex: 1,
+    color: '#cbd5e1',
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    textTransform: 'none',
+    fontWeight: 700,
+    fontSize: '0.92rem',
+    borderRadius: 10,
+    padding: '11px 0',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.3)',
+      color: '#fff'
+    }
+  },
+  newSaleBtn: {
+    flex: 1,
+    backgroundColor: '#00a0ee',
+    color: '#ffffff',
+    fontWeight: 700,
+    fontSize: '0.92rem',
+    borderRadius: 10,
+    padding: '11px 0',
+    textTransform: 'none',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      backgroundColor: '#008cd1',
+      boxShadow: '0 4px 14px rgba(0, 160, 238, 0.4)'
+    }
+  }
 }));
 
 const money = n => `LKR ${Number(n || 0).toFixed(2)}`;
 const isMalabe = c => c && c.name && c.name.toLowerCase().includes('malabe');
-const labelsFor = (seats, rows) =>
-  (seats || []).map(([r, c]) => `${String.fromCharCode(65 + rows - 1 - r)}${c + 1}`);
+const labelsFor = (seats, rows = 10) =>
+  (seats || []).map(([r, c]) => `${String.fromCharCode(65 + Math.max(0, (rows || 10) - 1 - r))}${c + 1}`);
 const refOf = id => String(id || '').slice(-8).toUpperCase();
 
 function POSNewSale(props) {
@@ -406,14 +546,14 @@ function POSNewSale(props) {
     const movieTitle =
       (movies.find(m => String(m._id) === String(r.movieId)) || {}).title || '';
     const cinema = cinemas.find(c => String(c._id) === String(r.cinemaId));
-    const cinemaRows = cinema && cinema.seats ? cinema.seats.length : 0;
+    const cinemaRows = (cinema && cinema.seats && cinema.seats.length) || 10;
     return {
       cinemaName: cinema ? cinema.name : '',
       movieTitle,
       date: r.date,
       startAt: r.startAt,
       format: r.format,
-      seatLabels: cinemaRows ? labelsFor(r.seats, cinemaRows) : [],
+      seatLabels: labelsFor(r.seats, cinemaRows),
       seatCount: Array.isArray(r.seats) ? r.seats.length : 0,
       subtotal: r.subtotal,
       convenienceFee: r.convenienceFee,
@@ -455,77 +595,111 @@ function POSNewSale(props) {
   if (success) {
     const r = success.reservation || {};
     const title = receipt ? receipt.movieTitle : '';
+    const seatLabels = (receipt && receipt.seatLabels && receipt.seatLabels.length)
+      ? receipt.seatLabels
+      : labelsFor(r.seats, 10);
+
     return (
       <>
         <div className={classes.success}>
-          <CheckCircleIcon className={classes.successIcon} />
-          <Typography variant="h5" style={{ fontWeight: 800, marginTop: 8 }}>
-            {success.method === 'card' ? 'Card payment complete' : 'Payment complete'}
+          <div className={classes.successBadge}>
+            <CheckCircleIcon className={classes.successIcon} />
+          </div>
+          <Typography variant="h5" style={{ fontWeight: 800, color: '#f8fafc', letterSpacing: '0.2px' }}>
+            {success.method === 'card' ? 'Card Payment Complete' : 'Payment Complete'}
           </Typography>
-          <Typography className={classes.muted} style={{ marginTop: 4 }}>
-            {title ? `${title} · ` : ''}
+          <Typography style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: 6, lineHeight: 1.4 }}>
+            {title && <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{title}</span>}
+            {title && (receipt && receipt.cinemaName || r.startAt) ? ' · ' : ''}
             {receipt && receipt.cinemaName ? `${receipt.cinemaName} · ` : ''}
-            {r.startAt}
+            <span style={{ color: '#00a0ee', fontWeight: 600 }}>{r.startAt}</span>
           </Typography>
 
-          {/* Prominent seat numbers */}
-          <div
-            style={{
-              margin: '16px auto 4px',
-              padding: '10px 14px',
-              borderRadius: 12,
-              border: '1px solid rgba(0,198,255,0.35)',
-              background: 'rgba(0,198,255,0.08)',
-              display: 'inline-block'
-            }}>
-            <div style={{ fontSize: 11, letterSpacing: 2, color: '#94a3b8', marginBottom: 6 }}>
-              {receipt && receipt.seatLabels && receipt.seatLabels.length > 1 ? 'SEATS' : 'SEAT'}
+          {/* Seat Badges */}
+          <div className={classes.seatSection}>
+            <div className={classes.seatSectionTitle}>
+              {seatLabels.length > 1 ? 'SEATS RESERVED' : 'SEAT RESERVED'}
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {receipt && receipt.seatLabels && receipt.seatLabels.length ? (
-                receipt.seatLabels.map(s => (
-                  <span
-                    key={s}
-                    style={{
-                      fontSize: 18,
-                      fontWeight: 800,
-                      color: '#fff',
-                      background: ACCENT,
-                      borderRadius: 8,
-                      padding: '4px 12px',
-                      letterSpacing: 1
-                    }}>
+              {seatLabels && seatLabels.length ? (
+                seatLabels.map(s => (
+                  <span key={s} className={classes.seatPill}>
+                    <EventSeatIcon style={{ fontSize: 16, marginRight: 5, verticalAlign: 'text-bottom' }} />
                     {s}
                   </span>
                 ))
               ) : (
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>
-                  {Array.isArray(r.seats) ? r.seats.length : 0} seat(s)
+                <span className={classes.seatPill}>
+                  <EventSeatIcon style={{ fontSize: 16, marginRight: 5, verticalAlign: 'text-bottom' }} />
+                  {Array.isArray(r.seats) ? r.seats.length : 0} Seat(s)
                 </span>
               )}
             </div>
           </div>
 
-          {success.QRCode && <img className={classes.qr} src={success.QRCode} alt="Ticket QR code" />}
-          <Typography className={classes.ref}>REF {refOf(r._id)}</Typography>
-          <Typography style={{ fontWeight: 800, fontSize: '1.3rem', margin: '12px 0' }}>
-            {money(r.total)}{' '}
-            <span className={classes.muted} style={{ fontSize: 13 }}>· {success.method}</span>
-          </Typography>
-          {success.method === 'cash' && success.tendered != null && (
-            <Typography className={classes.muted} style={{ marginBottom: 8 }}>
-              Cash {money(success.tendered)} · Change {money(success.change)}
-            </Typography>
+          {/* QR Code Card */}
+          {success.QRCode && (
+            <div className={classes.qrCard}>
+              <img className={classes.qr} src={success.QRCode} alt="Ticket QR code" />
+            </div>
           )}
-          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+
+          {/* Reference pill */}
+          <div className={classes.refBadge}>
+            <span style={{ color: '#64748b', marginRight: 6 }}>REF</span>
+            <span style={{ color: '#00a0ee', fontWeight: 800 }}>{refOf(r._id)}</span>
+          </div>
+
+          {/* Payment & Cash change breakdown */}
+          <div className={classes.paymentSummary}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, color: '#64748b', textTransform: 'uppercase' }}>
+                  Total Paid
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '1.45rem', color: '#f8fafc', lineHeight: 1.2, marginTop: 2 }}>
+                  {money(r.total)}
+                </div>
+              </div>
+              <span className={classes.methodPill}>
+                {success.method === 'card' ? (
+                  <>
+                    <CreditCardIcon style={{ fontSize: 14, marginRight: 5 }} /> CARD
+                  </>
+                ) : (
+                  <>
+                    <LocalAtmIcon style={{ fontSize: 14, marginRight: 5 }} /> CASH
+                  </>
+                )}
+              </span>
+            </div>
+
+            {success.method === 'cash' && success.tendered != null && (
+              <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.06)', marginTop: 12, paddingTop: 10, display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <div style={{ color: '#94a3b8' }}>
+                  Tendered: <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{money(success.tendered)}</span>
+                </div>
+                <div style={{ color: '#94a3b8' }}>
+                  Change: <span style={{ color: '#10b981', fontWeight: 700 }}>{money(success.change)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: 12 }}>
             <Button
               variant="outlined"
-              style={{ flex: 1, color: '#cbd5e1', borderColor: 'rgba(255,255,255,0.2)', textTransform: 'none' }}
+              className={classes.printBtn}
               onClick={() => window.print()}>
-              Print bill
+              <PrintIcon style={{ fontSize: 18, marginRight: 8 }} />
+              Print Bill
             </Button>
-            <Button className={classes.completeBtn} style={{ flex: 1 }} onClick={resetSale}>
-              New sale
+            <Button
+              className={classes.newSaleBtn}
+              onClick={resetSale}>
+              <AddIcon style={{ fontSize: 18, marginRight: 6 }} />
+              New Sale
             </Button>
           </div>
         </div>

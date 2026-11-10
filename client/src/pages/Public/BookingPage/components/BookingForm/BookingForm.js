@@ -171,19 +171,19 @@ const useStyles = makeStyles(theme => ({
   },
   counterValue: { fontSize: '22px', fontWeight: 800, color: '#ff4d6d', minWidth: '32px' },
   selectSeatsBtn: {
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072ff 100%)',
+    backgroundColor: '#00a0ee',
     color: '#fff',
     width: '100%',
     padding: '12px',
     fontWeight: 700,
     fontSize: '14px',
     letterSpacing: '1px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 20px rgba(0,198,255,0.4)',
+    borderRadius: '8px',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)',
     transition: 'all 0.2s ease',
     '&:hover': {
-      background: 'linear-gradient(135deg, #00b4e6 0%, #0060d6 100%)',
-      boxShadow: '0 6px 25px rgba(0,198,255,0.6)',
+      backgroundColor: '#008cd1',
+      boxShadow: '0 4px 12px rgba(0, 160, 238, 0.35)',
       transform: 'translateY(-1px)'
     }
   }

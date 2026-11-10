@@ -13,17 +13,17 @@ export default {
     muted: '#94a3b8'
   },
   default: {
-    light: 'rgba(0, 198, 255, 0.08)',
-    main: '#00C6FF',
+    light: 'rgba(0, 160, 238, 0.08)',
+    main: '#00a0ee',
     dark: '#0c101c',
     logoBg: '#131b2e',
     border: 'rgba(255, 255, 255, 0.08)',
     contrastText: white
   },
   primary: {
-    light: '#56CCF2',
-    main: '#00C6FF',
-    dark: '#0072FF',
+    light: '#33b3f1',
+    main: '#00a0ee',
+    dark: '#007ab8',
     contrastText: white
   },
   secondary: {
@@ -64,7 +64,7 @@ export default {
   text: {
     primary: '#f8fafc',
     secondary: '#94a3b8',
-    link: '#00C6FF'
+    link: '#00a0ee'
   },
   border: 'rgba(255, 255, 255, 0.08)',
   borderShadow: 'rgba(0, 0, 0, 0.5)',

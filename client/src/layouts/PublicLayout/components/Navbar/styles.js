@@ -44,8 +44,8 @@ export default theme => ({
     fontSize: '1.5rem',
     borderRadius: 11,
     color: '#fff',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
-    boxShadow: '0 4px 16px rgba(0,114,255,0.45)'
+    backgroundColor: '#00a0ee',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.3)'
   },
   logo: {
     maxHeight: '2.4rem',
@@ -86,7 +86,7 @@ export default theme => ({
       width: 0,
       height: '2px',
       borderRadius: 2,
-      background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+      backgroundColor: '#00a0ee',
       transition: 'width 220ms ease',
       zIndex: 1
     },

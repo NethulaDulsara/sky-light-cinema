@@ -56,8 +56,7 @@ const useStyles = makeStyles(theme => ({
     height: 4,
     borderRadius: 4,
     margin: `${theme.spacing(2.5)}px auto 0`,
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
-    boxShadow: '0 4px 14px rgba(0,114,255,0.5)'
+    backgroundColor: '#00a0ee'
   },
   controls: {
     display: 'flex',
@@ -86,8 +85,8 @@ const useStyles = makeStyles(theme => ({
   chipActive: {
     color: '#fff',
     border: '1px solid transparent',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
-    boxShadow: '0 6px 16px rgba(0,114,255,0.4)'
+    backgroundColor: '#00a0ee',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)'
   },
   sortWrap: { display: 'flex', alignItems: 'center', gap: theme.spacing(1) },
   sortLabel: { color: 'rgba(255,255,255,0.55)', fontSize: '0.85rem' },

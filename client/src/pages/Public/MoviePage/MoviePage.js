@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     width: 6,
     height: 26,
     borderRadius: 3,
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     display: 'inline-block'
   },
   sectionSub: {
@@ -117,7 +117,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: '1rem',
     fontWeight: 700,
     color: '#fff',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)'
+    backgroundColor: '#00a0ee'
   },
   castName: { fontSize: '0.92rem', fontWeight: 600, textTransform: 'capitalize', lineHeight: 1.2 },
   castRole: { fontSize: '0.75rem', color: 'rgba(255,255,255,0.45)' },
@@ -136,7 +136,7 @@ const useStyles = makeStyles(theme => ({
   tabActive: {
     color: '#fff',
     border: '1px solid transparent',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)'
+    backgroundColor: '#00a0ee'
   },
   mediaGrid: {
     display: 'grid',
@@ -178,8 +178,8 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     color: '#fff',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
-    boxShadow: '0 8px 22px rgba(0,114,255,0.5)'
+    backgroundColor: '#00a0ee',
+    boxShadow: '0 2px 8px rgba(0, 160, 238, 0.25)'
   },
   empty: { color: 'rgba(255,255,255,0.5)', marginLeft: theme.spacing(2.5) },
   dialogPaper: { background: '#05070c', overflow: 'hidden', borderRadius: 14, position: 'relative' },

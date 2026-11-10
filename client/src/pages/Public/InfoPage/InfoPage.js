@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 700,
     fontSize: '0.8rem',
     color: '#fff',
-    background: 'linear-gradient(135deg, #00C6FF 0%, #0072FF 100%)',
+    backgroundColor: '#00a0ee',
     marginBottom: theme.spacing(2)
   },
   contactGrid: { marginTop: theme.spacing(1) },
